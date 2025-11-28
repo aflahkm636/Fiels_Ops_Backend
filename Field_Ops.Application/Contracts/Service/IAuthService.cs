@@ -1,4 +1,5 @@
 ﻿using Field_Ops.Application.DTO.CustomerDto;
+using Field_Ops.Application.DTO.UserDto;
 using Field_Ops.Application.DTOs.AuthDto;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Field_Ops.Application.Contracts.Service
 {
     public interface IAuthService
     {
-        Task<AuthReponseDto> RegisterUserAsync(CustomerRegisterDto dto);
+        Task<AuthResponseDto> RegisterUserAsync(CustomerRegisterDto dto);
+        Task<AuthResponseDto> LoginAsync(UserLoginDto dto);
     }
 }

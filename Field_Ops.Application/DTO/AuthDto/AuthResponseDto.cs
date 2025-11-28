@@ -2,7 +2,7 @@
 
 namespace Field_Ops.Application.DTOs.AuthDto
 {
-    public class AuthReponseDto
+    public class AuthResponseDto
     {
         public int StatusCode { get; set; }
         public string Message { get; set; } = string.Empty;
@@ -13,13 +13,13 @@ namespace Field_Ops.Application.DTOs.AuthDto
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? RefreshToken { get; set; }
 
-        public AuthReponseDto(int statusCode, string message)
+        public AuthResponseDto(int statusCode, string message)
         {
             StatusCode = statusCode;
             Message = message;
             
         }
-        public AuthReponseDto(int statusCode, string message, string token)
+        public AuthResponseDto(int statusCode, string message, string token)
         {
             StatusCode = statusCode;
             Message = message;
