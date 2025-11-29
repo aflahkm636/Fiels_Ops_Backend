@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data;
@@ -10,8 +8,6 @@ using Field_Ops.Application.Contracts.Repository;
 
 namespace Field_Ops.Infrastructure.Repository
 {
-    
-
     public class UsersRepository : IUsersRepository
     {
         private readonly IDbConnection _db;
@@ -23,63 +19,214 @@ namespace Field_Ops.Infrastructure.Repository
 
         public async Task<int> RegisterUserAsync(UserRegisterDto dto)
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@FLAG", "INSERT");
-
-
-            parameters.Add("@Name", dto.Name);
-            parameters.Add("@Email", dto.Email);
-            parameters.Add("@Phone", dto.Phone);
-            parameters.Add("@PasswordHash", dto.PasswordHash);
-            parameters.Add("@Role", dto.Role);
-            parameters.Add("@Status", true);
-            parameters.Add("@ProfileImage", null);
-            parameters.Add("@CreatedBy", dto.CreatedBy);
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "INSERT");
+            p.Add("@Name", dto.Name);
+            p.Add("@Email", dto.Email);
+            p.Add("@Phone", dto.Phone);
+            p.Add("@PasswordHash", dto.PasswordHash);
+            p.Add("@Role", dto.Role);
+            p.Add("@Status", true);
+            p.Add("@ProfileImage", null);
+            p.Add("@CreatedBy", dto.CreatedBy);
 
             return await _db.ExecuteScalarAsync<int>(
                 "SP_USERS",
-                parameters,
+                p,
                 commandType: CommandType.StoredProcedure
             );
         }
 
         public async Task<dynamic?> GetUserByEmailAsync(string email)
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@FLAG", "GETUSER_BY_EMAIL");
-            parameters.Add("@Email", email);
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "GETUSER_BY_EMAIL");
+            p.Add("@Email", email);
 
             return await _db.QueryFirstOrDefaultAsync<dynamic>(
                 "SP_USERS",
-                parameters,
+                p,
                 commandType: CommandType.StoredProcedure
             );
         }
 
         public async Task<IEnumerable<dynamic>> GetAllAsync()
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@FLAG", "GETALL");
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "GETALL");
 
             return await _db.QueryAsync<dynamic>(
                 "SP_USERS",
-                parameters,
+                p,
                 commandType: CommandType.StoredProcedure
             );
         }
 
         public async Task<dynamic?> GetByIdAsync(int id)
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@FLAG", "GETBYID");
-            parameters.Add("@Id", id);
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "GETBYID");
+            p.Add("@Id", id);
 
             return await _db.QueryFirstOrDefaultAsync<dynamic>(
                 "SP_USERS",
-                parameters,
+                p,
                 commandType: CommandType.StoredProcedure
             );
         }
-    }
 
+        public async Task<bool> UpdateUserAsync(UserUpdateDto dto)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "UPDATE");
+            p.Add("@Id", dto.Id);
+            p.Add("@Name", dto.Name);
+            p.Add("@Email", dto.Email);
+            p.Add("@Phone", dto.Phone);
+            p.Add("@Role", dto.Role);
+            p.Add("@Status", dto.Status);
+            p.Add("@ProfileImage", dto.ProfileImage);
+            p.Add("@ModifiedBy", dto.ModifiedBy);
+
+            try
+            {
+                await _db.ExecuteAsync(
+                    "SP_USERS",
+                    p,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return true;  
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteUserAsync(int id, int deletedBy)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "DELETE");
+            p.Add("@Id", id);
+            p.Add("@DeletedBy", deletedBy);
+
+            try
+            {
+                await _db.ExecuteAsync(
+                    "SP_USERS",
+                    p,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        public async Task<string?> GetPasswordHashAsync(int userId)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "GET_HASHED_PASSWORD");
+            p.Add("@UserId", userId);
+
+            return await _db.QueryFirstOrDefaultAsync<string>(
+                "USP_PASSWORD",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
+        }
+        public async Task<bool> ChangePasswordAsync(int userId, string newHash, int modifiedBy)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "CHANGE_PASSWORD");
+            p.Add("@UserId", userId);
+            p.Add("@NewPasswordHash", newHash);
+            p.Add("@ModifiedBy", modifiedBy);
+
+            try
+            {
+                var rows = await _db.ExecuteScalarAsync<int>(
+                    "USP_PASSWORD",
+                    p,
+                    commandType: CommandType.StoredProcedure
+                );
+                return rows > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+
+
+        public async Task<bool> SaveResetOtpAsync(string email, string otp, DateTime expiry)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "SET_RESET_OTP");
+            p.Add("@Email", email);
+            p.Add("@ResetOtp", otp);
+            p.Add("@OtpExpiry", expiry);
+
+            try
+            {
+                var rows = await _db.ExecuteScalarAsync<int>(
+                    "USP_PASSWORD",
+                    p,
+                    commandType: CommandType.StoredProcedure
+                );
+                return rows > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+
+        public async Task<(string?, DateTime?)> GetResetOtpAsync(string email)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "GET_RESET_OTP");
+            p.Add("@Email", email);
+
+            return await _db.QueryFirstOrDefaultAsync<(string?, DateTime?)>(
+                "USP_PASSWORD",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
+        }
+
+
+
+        public async Task<bool> ResetPasswordAsync(string email, string newHash)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "RESET_PASSWORD");
+            p.Add("@Email", email);
+            p.Add("@NewPasswordHash", newHash);
+
+            try
+            {
+                var rows = await _db.ExecuteScalarAsync<int>(
+                    "USP_PASSWORD",
+                    p,
+                    commandType: CommandType.StoredProcedure
+                );
+                return rows > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        
+    }
+    }
 }

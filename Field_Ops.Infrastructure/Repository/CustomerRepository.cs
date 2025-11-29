@@ -34,7 +34,7 @@ namespace Field_Ops.Infrastructure.Repository
             parameters.Add("@Pincode", dto.Pincode);
             parameters.Add("@Status", true);
 
-            parameters.Add("@CreatedBy", dto.CreatedBy);
+            parameters.Add("@CreatedBy", null);
 
             await _db.ExecuteAsync(
                 "SP_CUSTOMERS",

@@ -23,7 +23,7 @@ namespace Field_Ops.Application.common
             StatusCode = statusCode;
         }
         public static ApiResponse<T> SuccessResponse(T data, string message = "Success", int statusCode = 200)
-                   => new(statusCode, message, data);
+              => new(statusCode, message, data);
 
         public static ApiResponse<T> FailResponse(string message, int statusCode = 400)
             => new(statusCode, message, default);

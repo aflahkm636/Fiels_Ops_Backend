@@ -30,6 +30,8 @@ namespace Field_Ops.WebApi.Extensions
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IUserService, UserService>();
+
 
             return services;
         }
