@@ -36,6 +36,15 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
+        [Authorize]
+        [HttpGet("Profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            int id = User.GetUserId();
+            var result = await _service.GetByIdAsync(id);
+            return StatusCode(result.StatusCode, result);
+        }
+
         [HttpGet("email")]
         public async Task<IActionResult> GetByEmail([FromQuery] string email)
         {
@@ -69,6 +78,7 @@ namespace Field_Ops.API.Controllers
         public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
         {
             dto.UserId = ClaimsHelper.GetUserId(User);
+            dto.ModifiedBy = User.GetUserId();
             var result = await _service.ChangePasswordAsync(dto);
             return StatusCode(result.StatusCode, result);
         }

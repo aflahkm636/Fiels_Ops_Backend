@@ -75,7 +75,10 @@ namespace Field_Ops.Application.DTO.UserDto
 
             public string CurrentPassword { get; set; } = string.Empty;
             public string NewPassword { get; set; } = string.Empty;
-            public int ModifiedBy { get; set; }
+
+        [JsonIgnore]
+
+        public int ModifiedBy { get; set; }
         }
 
     public class ResetPasswordDto

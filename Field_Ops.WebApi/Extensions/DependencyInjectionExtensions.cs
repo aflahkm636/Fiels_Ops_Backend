@@ -29,11 +29,13 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
             services.AddScoped<IEmployeesRepository, EmployeesRepository>();
+            services.AddScoped<ITechniciansRepository, TechniciansRepository>();
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmployeesService, EmployeesService>();
+            services.AddScoped<ITechniciansService, TechniciansService>();
 
 
             return services;
