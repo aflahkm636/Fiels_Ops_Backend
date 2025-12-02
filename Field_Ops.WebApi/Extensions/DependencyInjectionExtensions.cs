@@ -5,6 +5,7 @@ using Field_Ops.Application.Settings;
 using Field_Ops.Infrastructure.Repository;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Field_Ops.Application.Service;
 
 namespace Field_Ops.WebApi.Extensions
 {
@@ -27,10 +28,12 @@ namespace Field_Ops.WebApi.Extensions
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IEmployeesRepository, EmployeesRepository>();
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IEmployeesService, EmployeesService>();
 
 
             return services;

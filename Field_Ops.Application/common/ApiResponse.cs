@@ -11,6 +11,7 @@ namespace Field_Ops.Application.common
     {
         public int StatusCode { get; set; }
         public string? Message { get; set; }
+
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public T? Data { get; set; }
 
@@ -22,10 +23,14 @@ namespace Field_Ops.Application.common
             Message = message;
             StatusCode = statusCode;
         }
-        public static ApiResponse<T> SuccessResponse(T data, string message = "Success", int statusCode = 200)
-              => new(statusCode, message, data);
-
-        public static ApiResponse<T> FailResponse(string message, int statusCode = 400)
-            => new(statusCode, message, default);
+        public static ApiResponse<T> SuccessResponse(
+                int statusCode = 200,
+                string message = "Success",
+                T? data = default)
+                => new(statusCode, message, data);
+        public static ApiResponse<T> FailResponse(int statusCode , string message)
+        {
+            return new(statusCode, message, default);
+        }
     }
 }

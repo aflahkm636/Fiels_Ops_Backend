@@ -46,8 +46,8 @@ namespace Field_Ops.WebApi.Extensions
             {
                 options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
                 options.AddPolicy("StaffOnly", p => p.RequireRole("Staff"));
-                options.AddPolicy("UserOnly", p => p.RequireRole("User"));
                 options.AddPolicy("TechnicianOnly", p => p.RequireRole("Technician"));
+                options.AddPolicy("CustomerOnly", p => p.RequireRole("Customer"));
             });
 
             return services;

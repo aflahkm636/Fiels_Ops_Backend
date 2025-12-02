@@ -23,67 +23,62 @@ namespace Field_Ops.Application.Services
             var user = await _repo.GetUserByEmailAsync(email);
 
             return user != null
-                ? ApiResponse<dynamic?>.SuccessResponse(user)
-                : ApiResponse<dynamic?>.FailResponse("User not found", 404);
+                ? ApiResponse<dynamic?>.SuccessResponse(200, "User fetched successfully", user)
+                : ApiResponse<dynamic?>.FailResponse(404, "User not found");
         }
 
-
+      
         public async Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync()
         {
             var list = await _repo.GetAllAsync();
-            return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(list);
+            return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(200, "Users fetched successfully", list);
         }
 
-
-
+    
         public async Task<ApiResponse<dynamic?>> GetByIdAsync(int id)
         {
             var user = await _repo.GetByIdAsync(id);
 
             return user != null
-                ? ApiResponse<dynamic?>.SuccessResponse(user)
-                : ApiResponse<dynamic?>.FailResponse("User not found", 404);
+                ? ApiResponse<dynamic?>.SuccessResponse(200, "User fetched successfully", user)
+                : ApiResponse<dynamic?>.FailResponse(404, "User not found");
         }
 
-
-        
         public async Task<ApiResponse<bool>> UpdateUserAsync(UserUpdateDto dto)
         {
             var existingUser = await _repo.GetByIdAsync(dto.Id);
             if (existingUser == null)
-                return ApiResponse<bool>.FailResponse("User not found", 404);
+                return ApiResponse<bool>.FailResponse(404, "User not found");
 
             var ok = await _repo.UpdateUserAsync(dto);
 
             return ok
-                ? ApiResponse<bool>.SuccessResponse(true, "User updated successfully")
-                : ApiResponse<bool>.FailResponse("Failed to update user", 400);
+                ? ApiResponse<bool>.SuccessResponse(200, "User updated successfully", true)
+                : ApiResponse<bool>.FailResponse(400, "Failed to update user");
         }
 
-
-        
+     
         public async Task<ApiResponse<bool>> DeleteUserAsync(int id, int deletedBy)
         {
             var existing = await _repo.GetByIdAsync(id);
-
             if (existing == null)
-                return ApiResponse<bool>.FailResponse("User not found", 404);
+                return ApiResponse<bool>.FailResponse(404, "User not found");
 
             var ok = await _repo.DeleteUserAsync(id, deletedBy);
 
             return ok
-                ? ApiResponse<bool>.SuccessResponse(true, "User deleted successfully")
-                : ApiResponse<bool>.FailResponse("Failed to delete user", 400);
+                ? ApiResponse<bool>.SuccessResponse(200, "User deleted successfully", true)
+                : ApiResponse<bool>.FailResponse(400, "Failed to delete user");
         }
 
-
+       
         public async Task<ApiResponse<string?>> GetPasswordHashAsync(int userId)
         {
             var hash = await _repo.GetPasswordHashAsync(userId);
 
             return hash != null
-                ? ApiResponse<string?>.SuccessResponse(hash)
-                : ApiResponse<string?>.FailResponse("User not found", 404);
+                ? ApiResponse<string?>.SuccessResponse(200, "Password hash fetched", hash)
+                : ApiResponse<string?>.FailResponse(404, "User not found");
         }
 
         public async Task<ApiResponse<string>> ChangePasswordAsync(ChangePasswordDto dto)

@@ -19,7 +19,7 @@ public class EmailService : IEmailService
     public async Task<bool> SendEmailAsync(string to, string subject, string htmlBody)
     {
         var email = new MimeMessage();
-        email.From.Add(new MailboxAddress("SmartServeERP", _settings.From));
+        email.From.Add(new MailboxAddress("FieldOps_ERP", _settings.From));
         email.To.Add(new MailboxAddress("", to));
         email.Subject = subject;
 
