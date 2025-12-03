@@ -45,20 +45,32 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [HttpGet("email")]
-        public async Task<IActionResult> GetByEmail([FromQuery] string email)
+        //[HttpGet("email")]
+        //public async Task<IActionResult> GetByEmail([FromQuery] string email)
+        //{
+        //    var result = await _service.GetUserByEmailAsync(email);
+        //    return StatusCode(result.StatusCode, result);
+        //}
+
+
+        [Authorize]
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UserProfileUpdateDto dto)
         {
-            var result = await _service.GetUserByEmailAsync(email);
+            dto.Id = User.GetUserId();
+            dto.ModifiedBy = User.GetUserId();
+
+            var result = await _service.UpdateUserProfileAsync(dto);
             return StatusCode(result.StatusCode, result);
         }
 
-
-     [Authorize(Roles = "Admin")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser(UserUpdateDto dto)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("role")]
+        public async Task<IActionResult> UpdateRole([FromBody] UserRoleUpdateDto dto)
         {
-            dto.ModifiedBy = User.GetUserId(); 
-            var result = await _service.UpdateUserAsync(dto);
+            dto.ModifiedBy = User.GetUserId();
+
+            var result = await _service.UpdateUserRoleAsync(dto);
             return StatusCode(result.StatusCode, result);
         }
 
@@ -77,7 +89,7 @@ namespace Field_Ops.API.Controllers
         
         public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
         {
-            dto.UserId = ClaimsHelper.GetUserId(User);
+            dto.UserId = User.GetUserId();
             dto.ModifiedBy = User.GetUserId();
             var result = await _service.ChangePasswordAsync(dto);
             return StatusCode(result.StatusCode, result);

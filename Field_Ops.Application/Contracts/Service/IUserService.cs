@@ -13,7 +13,9 @@ namespace Field_Ops.Application.Contracts.Service
         Task<ApiResponse<dynamic?>> GetUserByEmailAsync(string email);
         Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync();
         Task<ApiResponse<dynamic?>> GetByIdAsync(int id);
-        Task<ApiResponse<bool>> UpdateUserAsync(UserUpdateDto dto);
+        Task<ApiResponse<bool>> UpdateUserProfileAsync(UserProfileUpdateDto dto);
+        Task<ApiResponse<bool>> UpdateUserRoleAsync(UserRoleUpdateDto dto);
+
         Task<ApiResponse<bool>> DeleteUserAsync(int id, int deletedBy);
 
         Task<ApiResponse<string?>> GetPasswordHashAsync(int userId);

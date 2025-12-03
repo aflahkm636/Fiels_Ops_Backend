@@ -44,20 +44,33 @@ namespace Field_Ops.Application.Services
                 : ApiResponse<dynamic?>.FailResponse(404, "User not found");
         }
 
-        public async Task<ApiResponse<bool>> UpdateUserAsync(UserUpdateDto dto)
+        public async Task<ApiResponse<bool>> UpdateUserProfileAsync(UserProfileUpdateDto dto)
         {
-            var existingUser = await _repo.GetByIdAsync(dto.Id);
-            if (existingUser == null)
+            var existing = await _repo.GetByIdAsync(dto.Id);
+            if (existing == null)
                 return ApiResponse<bool>.FailResponse(404, "User not found");
 
-            var ok = await _repo.UpdateUserAsync(dto);
+            var ok = await _repo.UpdateProfileAsync(dto);
 
             return ok
-                ? ApiResponse<bool>.SuccessResponse(200, "User updated successfully", true)
-                : ApiResponse<bool>.FailResponse(400, "Failed to update user");
+                ? ApiResponse<bool>.SuccessResponse(200, "Profile updated successfully", true)
+                : ApiResponse<bool>.FailResponse(400, "Failed to update profile");
         }
 
-     
+        public async Task<ApiResponse<bool>> UpdateUserRoleAsync(UserRoleUpdateDto dto)
+        {
+            var existing = await _repo.GetByIdAsync(dto.Id);
+            if (existing == null)
+                return ApiResponse<bool>.FailResponse(404, "User not found");
+
+            var ok = await _repo.UpdateRoleAsync(dto);
+
+            return ok
+                ? ApiResponse<bool>.SuccessResponse(200, "Role updated successfully", true)
+                : ApiResponse<bool>.FailResponse(400, "Failed to update role");
+        }
+
+
         public async Task<ApiResponse<bool>> DeleteUserAsync(int id, int deletedBy)
         {
             var existing = await _repo.GetByIdAsync(id);

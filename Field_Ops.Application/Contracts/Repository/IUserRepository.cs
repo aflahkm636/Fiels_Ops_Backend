@@ -19,7 +19,8 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<bool> SaveResetOtpAsync(string email, string otp, DateTime expiry);
         Task<bool> ChangePasswordAsync(int userId, string newHash, int modifiedBy);
         Task<string?> GetPasswordHashAsync(int userId);
-        Task<bool> UpdateUserAsync(UserUpdateDto dto);
+        Task<bool> UpdateRoleAsync(UserRoleUpdateDto dto);
+        Task<bool> UpdateProfileAsync(UserProfileUpdateDto dto);
         Task<bool> DeleteUserAsync(int id, int deletedBy);
     }
 }

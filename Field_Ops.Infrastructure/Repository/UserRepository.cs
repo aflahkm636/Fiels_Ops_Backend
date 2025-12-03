@@ -75,28 +75,40 @@ namespace Field_Ops.Infrastructure.Repository
             );
         }
 
-        public async Task<bool> UpdateUserAsync(UserUpdateDto dto)
+        public async Task<bool> UpdateProfileAsync(UserProfileUpdateDto dto)
         {
             var p = new DynamicParameters();
-            p.Add("@FLAG", "UPDATE");
+            p.Add("@FLAG", "UPDATE_PROFILE");
             p.Add("@Id", dto.Id);
             p.Add("@Name", dto.Name);
-            p.Add("@Email", dto.Email);
             p.Add("@Phone", dto.Phone);
-            p.Add("@Role", dto.Role);
-            p.Add("@Status", dto.Status);
             p.Add("@ProfileImage", dto.ProfileImage);
             p.Add("@ModifiedBy", dto.ModifiedBy);
 
             try
             {
-                await _db.ExecuteAsync(
-                    "SP_USERS",
-                    p,
-                    commandType: CommandType.StoredProcedure
-                );
+                await _db.ExecuteAsync("SP_USERS", p, commandType: CommandType.StoredProcedure);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
-                return true;  
+      
+        public async Task<bool> UpdateRoleAsync(UserRoleUpdateDto dto)
+        {
+            var p = new DynamicParameters();
+            p.Add("@FLAG", "UPDATE_ROLE");
+            p.Add("@Id", dto.Id);
+            p.Add("@Role", dto.Role);
+            p.Add("@ModifiedBy", dto.ModifiedBy);
+
+            try
+            {
+                await _db.ExecuteAsync("SP_USERS", p, commandType: CommandType.StoredProcedure);
+                return true;
             }
             catch
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Field_ops.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,19 +49,27 @@ namespace Field_Ops.Application.DTO.UserDto
         public string Password { get; set; } = default!;
     }
 
-    public class UserUpdateDto
+
+
+    public class UserRoleUpdateDto
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Email { get; set; }
-        public string? Phone { get; set; }
-        public string? Role { get; set; }
-        public bool? Status { get; set; }
-        public string? ProfileImage { get; set; }
+        public Roles Role { get; set; } = default!;
 
         [JsonIgnore]
         public int ModifiedBy { get; set; }
     }
+    public class UserProfileUpdateDto
+    {
+        [JsonIgnore]
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public string? ProfileImage { get; set; }
+        [JsonIgnore]
+        public int ModifiedBy { get; set; }
+    }
+
 
     public class ForgotPasswordDto
     {
