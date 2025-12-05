@@ -11,56 +11,14 @@ namespace Field_Ops.Application.Service
     public class EmployeesService : IEmployeesService
     {
         private readonly IEmployeesRepository _repo;
-        private readonly IEmailService _emailService;
 
-        public EmployeesService(IEmployeesRepository repo ,IEmailService emailService)
+        public EmployeesService(IEmployeesRepository repo )
         {
             _repo = repo;
-            _emailService = emailService;
         }
 
      
-        public async Task<ApiResponse<bool>> CreateEmployeeAsync(EmployeeCreateDto dto)
-
-        {
-            //if (string.IsNullOrWhiteSpace(dto.Name))
-            //    throw new ArgumentException("Name is required.");
-
-            //if (string.IsNullOrWhiteSpace(dto.Email))
-            //    throw new ArgumentException("Email is required.");
-
-            //if (string.IsNullOrWhiteSpace(dto.PasswordHash))
-            //    throw new ArgumentException("PasswordHash is required.");
-
-
-            //if (dto.Role.ToString() == "Technician" && dto.DepartmentId != 2)
-
-            string tempPassword = string.IsNullOrWhiteSpace(dto.Password)
-              ? PasswordHelper.GenerateTemporaryPassword()
-              : dto.Password;
-
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword);
-
-            dto.Password = hashedPassword;
-
-            var isCreated = await _repo.CreateEmployeeAsync(dto);
-
-            if (!isCreated)
-                return ApiResponse<bool>.FailResponse(400,"Employee creation failed");
-
-            string subject = "Welcome to Field_Ops";
-            string body = $@"
-        <h3>Hello {dto.Name},</h3>
-        <p>Your Field_Ops account has been created successfully.</p>
-        <p><b>Email:</b> {dto.Email}<br>
-        <b>Temporary Password:</b> {tempPassword}</p>
-        <p>Please log in and change your password immediately.</p>
-        <p>Best regards,<br>Field_Ops Team</p>";
-
-            await _emailService.SendEmailAsync(dto.Email,subject,body);
-
-            return ApiResponse<bool>.SuccessResponse(201, $"Staff created successfully! Credentials sent to {dto.Email}.");
-        }
+      
 
         public async Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync()
         {

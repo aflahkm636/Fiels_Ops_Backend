@@ -10,7 +10,7 @@ namespace Field_Ops.Application.Contracts.Repository
 {
     public interface ICustomerRepository
     {
-        Task AddCustomerAsync(CustomerRegisterDto dto);
+        Task<bool> AddCustomerAsync(CustomerRegisterDto dto);
         Task<IEnumerable<CustomerDto>> GetAllAsync();
         Task<CustomerDto?> GetByIdAsync(int id);
         Task<CustomerDto?> GetByUserIdAsync(int userId);

@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Field_Ops.Infrastructure.Repository
 {
-    
+
 
     public class CustomerRepository : ICustomerRepository
     {
@@ -16,7 +16,7 @@ namespace Field_Ops.Infrastructure.Repository
             _db = db;
         }
 
-        public async Task AddCustomerAsync(CustomerRegisterDto dto)
+        public async Task<bool> AddCustomerAsync(CustomerRegisterDto dto)
         {
             var parameters = new DynamicParameters();
 
@@ -34,13 +34,15 @@ namespace Field_Ops.Infrastructure.Repository
             parameters.Add("@Pincode", dto.Pincode);
             parameters.Add("@Status", true);
 
-            parameters.Add("@CreatedBy", null);
+            parameters.Add("@CreatedBy", dto.CreatedBy);
 
-            await _db.ExecuteAsync(
-                "SP_CUSTOMERS",
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
+            var result = await _db.ExecuteAsync(
+          "SP_CUSTOMERS",
+          parameters,
+          commandType: CommandType.StoredProcedure
+      );
+
+            return true;
         }
 
         public async Task<IEnumerable<CustomerDto>> GetAllAsync()
@@ -80,6 +82,17 @@ namespace Field_Ops.Infrastructure.Repository
                 commandType: CommandType.StoredProcedure
             );
         }
+
+        public async Task<int> GetCustomerIdByUserId(int userId)
+        {
+            var sql = @"SELECT Id 
+                FROM Customers 
+                WHERE UserId = @userId 
+                  AND Status = 1
+                  AND IsDeleted = 0";
+
+            return await _db.QueryFirstOrDefaultAsync<int>(sql, new { userId });
+        }
     }
 
-}
+    }

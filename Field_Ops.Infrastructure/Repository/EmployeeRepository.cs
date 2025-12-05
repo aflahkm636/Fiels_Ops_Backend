@@ -128,6 +128,28 @@ namespace Field_Ops.Infrastructure.Repository
                 return false;
             }
         }
+
+
+        public async Task<int>GetEmployeeIdByUSerID(int id)
+        {
+            var sql = @"SELECT Id FROM Employees
+                        WHERE UserId=@id
+                        AND Status=1
+                        AND IsDeleted=0
+                          ";
+
+            return await _db.QueryFirstOrDefaultAsync<int>(sql, new { id });
+        } 
+        public async Task<int>DepartmentIdByUSerID(int id)
+        {
+            var sql = @"SELECT DepartmentId  FROM Employees
+                        WHERE UserId=@id
+                        AND Status=1
+                        AND IsDeleted=0
+                          ";
+
+            return await _db.QueryFirstOrDefaultAsync<int>(sql, new { id });
+        } 
     }
 
     }

@@ -10,7 +10,6 @@ namespace Field_Ops.Application.Contracts.Service
 {
     public interface IEmployeesService
     {
-        Task<ApiResponse<bool>> CreateEmployeeAsync(EmployeeCreateDto dto);
         Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync();
         Task<ApiResponse<dynamic?>> GetByIdAsync(int id);
         Task<ApiResponse<bool>> UpdateEmployeeAsync(EmployeeUpdateDto dto);

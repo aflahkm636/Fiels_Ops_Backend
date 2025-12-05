@@ -1,3 +1,4 @@
+using Field_Ops.API.Middleware;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.Settings;
 using Field_Ops.WebApi.Extensions;
@@ -61,6 +62,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

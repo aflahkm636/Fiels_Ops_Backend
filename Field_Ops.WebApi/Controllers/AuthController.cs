@@ -1,8 +1,10 @@
 ﻿using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.CustomerDto;
+using Field_Ops.Application.DTO.EmployeeDto;
 using Field_Ops.Application.DTO.UserDto;
 using Field_Ops.Application.Helper;
 using Field_Ops.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Field_Ops.Api.Controllers
@@ -18,15 +20,26 @@ namespace Field_Ops.Api.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
+
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpPost("customer")]
         public async Task<IActionResult> Register([FromBody] CustomerRegisterDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            dto.CreatedBy = User.GetUserId();
             var response = await _authService.RegisterUserAsync(dto);
 
             return StatusCode(response.StatusCode, response);
+        }
+
+        [Authorize(Roles = "Admin,Staff")]
+        [HttpPost("Employee")]
+        public async Task<IActionResult> CreateEmployee([FromForm] EmployeeCreateDto dto)
+        {
+            dto.CreatedBy = User.GetUserId();
+            var result = await _authService.CreateEmployeeAsync(dto);
+            return StatusCode(result.StatusCode, result);
         }
 
         [HttpPost("login")]

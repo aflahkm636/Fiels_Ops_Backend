@@ -14,5 +14,7 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<dynamic?> GetByIdAsync(int id);
         Task<bool> UpdateEmployeeAsync(EmployeeUpdateDto dto);
         Task<bool> DeleteEmployeeAsync(int id, int deletedBy);
+        Task<int> DepartmentIdByUSerID(int id);
+        Task<int> GetEmployeeIdByUSerID(int id);
     }
 }

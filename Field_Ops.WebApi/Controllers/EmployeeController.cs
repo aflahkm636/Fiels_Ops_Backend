@@ -16,14 +16,7 @@ namespace Field_Ops.API.Controllers
         {
             _service = service;
         }
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeCreateDto dto)
-        {
-            dto.CreatedBy =User.GetUserId();
-            var result = await _service.CreateEmployeeAsync(dto);
-            return StatusCode(result.StatusCode, result);
-        }
+        
 
         [Authorize(Roles = "Admin,Staff")]
         [HttpGet]
