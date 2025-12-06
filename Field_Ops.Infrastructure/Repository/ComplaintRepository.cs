@@ -97,4 +97,17 @@ public class ComplaintsRepository : IComplaintsRepository
             commandType: CommandType.StoredProcedure
         );
     }
+
+    public async Task<IEnumerable<dynamic>> GetComplaintsAssignedToTechnicianAsync(int employeeId)
+    {
+        var p = new DynamicParameters();
+        p.Add("@FLAG", "GET_COMPLAINTS_ASSIGNED_TO_TECHNICIAN");
+        p.Add("@EmployeeId", employeeId);
+
+        return await _db.QueryAsync<dynamic>(
+            "SP_COMPLAINTS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
+    }
 }

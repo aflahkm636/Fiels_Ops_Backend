@@ -78,4 +78,18 @@ public class ComplaintsService : IComplaintsService
 
         return ApiResponse<bool>.SuccessResponse(200, "Status updated.");
     }
+
+    public async Task<ApiResponse<dynamic?>> GetComplaintsAssignedToTechnicianAsync(int employeeId)
+    {
+        var data = await _repo.GetComplaintsAssignedToTechnicianAsync(employeeId);
+
+        if (data == null)
+            throw new NotFoundException("Complaint not found.");
+
+        return ApiResponse<dynamic?>.SuccessResponse(
+            200,
+            "Complaints fetched.",
+            data
+        );
+    }
 }

@@ -16,5 +16,7 @@ namespace Field_Ops.Application.Contracts.Service
         Task<ApiResponse<bool>> UpdateAsync(ComplaintUpdateDto dto);
         Task<ApiResponse<bool >>DeleteAsync(int id, int actionUserId);
         Task<ApiResponse<bool>> UpdateStatusAsync(ComplaintStatusUpdateDto dto);
+
+        Task<ApiResponse<dynamic?>> GetComplaintsAssignedToTechnicianAsync(int employeeId);
     }
 }

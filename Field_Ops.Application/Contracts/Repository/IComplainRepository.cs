@@ -10,5 +10,6 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<int> UpdateAsync(ComplaintUpdateDto dto);
         Task<int> DeleteAsync(int id, int actionUserId);
         Task<int> UpdateStatusAsync(ComplaintStatusUpdateDto dto);
+        Task<IEnumerable<dynamic>> GetComplaintsAssignedToTechnicianAsync(int employeeId);
     }
 }

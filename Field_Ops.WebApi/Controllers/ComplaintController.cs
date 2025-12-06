@@ -12,11 +12,13 @@ public class ComplaintsController : ControllerBase
 {
     private readonly IComplaintsService _service;
     private readonly ICustomerRepository _customerRepository;
+    private readonly IEmployeesRepository _employeesRepository;
 
-    public ComplaintsController(IComplaintsService service ,ICustomerRepository customerRepository)
+    public ComplaintsController(IComplaintsService service ,ICustomerRepository customerRepository,IEmployeesRepository employeesRepository)
     {
         _service = service;
         _customerRepository = customerRepository;
+        _employeesRepository = employeesRepository;
     }
 
     [Authorize(Policy = "CustomerOnly")]
@@ -109,6 +111,21 @@ public class ComplaintsController : ControllerBase
         {
             int actionUserId = User.GetUserId();
             var result = await _service.DeleteAsync(id, actionUserId);
+            return StatusCode(result.StatusCode, result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(400, new { success = false, message = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> GetComplaintsAssignedToTechnicianAsync()
+    {
+        try
+        {
+            int userId = User.GetUserId();
+            int employeeId=await _employeesRepository.GetEmployeeIdByUSerID(userId);
+            var result = await _service.GetComplaintsAssignedToTechnicianAsync(employeeId);
             return StatusCode(result.StatusCode, result);
         }
         catch (Exception ex)
