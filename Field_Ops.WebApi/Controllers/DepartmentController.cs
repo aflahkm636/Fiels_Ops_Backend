@@ -1,9 +1,11 @@
 ﻿using Field_Ops.Application.DTO.DepartmentDto;
 using Field_Ops.Application.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles ="Admin,Staff")]
 public class DepartmentsController : ControllerBase
 {
     private readonly IDepartmentService _service;

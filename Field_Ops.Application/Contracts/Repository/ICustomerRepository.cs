@@ -14,6 +14,7 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<IEnumerable<CustomerDto>> GetAllAsync();
         Task<CustomerDto?> GetByIdAsync(int id);
         Task<CustomerDto?> GetByUserIdAsync(int userId);
+        Task<int> GetCustomerIdByUserId(int userId);
     }
 
 }
