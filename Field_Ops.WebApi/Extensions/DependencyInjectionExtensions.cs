@@ -36,6 +36,8 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             services.AddScoped<IComplaintsRepository, ComplaintsRepository>();
             services.AddScoped<IServiceTasksRepository,ServiceTasksRepository>();
+            services.AddScoped<ITaskEmployeesRepository, TaskEmployeesRepository>();
+            services.AddScoped<IAutomationRepository, AutomationRepository>();
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
@@ -47,6 +49,8 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<ISubscriptionService, SubscriptionService>();
             services.AddScoped<IComplaintsService, ComplaintsService>();
             services.AddScoped<IServiceTasksService, ServiceTasksService>();
+            services.AddScoped<ITaskEmployeesService, TaskEmployeesService>();
+            services.AddScoped<IAutomationService, AutomationService>();
 
 
             return services;

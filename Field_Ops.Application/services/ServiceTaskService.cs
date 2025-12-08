@@ -1,4 +1,5 @@
 ﻿using Field_ops.Domain.Enums;
+using Field_Ops.Application.common;
 using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO;
@@ -12,7 +13,7 @@ public class ServiceTasksService : IServiceTasksService
         _repo = repo;
     }
 
-    public async Task<int> CreateAsync(ServiceTaskCreateDto dto)
+    public async Task<ApiResponse<int>> CreateAsync(ServiceTaskCreateDto dto)
     {
         if (dto.SubscriptionId is null && dto.ComplaintId is null)
             throw new ArgumentException("SubscriptionId or ComplaintId is required.");
@@ -20,72 +21,142 @@ public class ServiceTasksService : IServiceTasksService
         if (dto.SubscriptionId is not null && dto.ComplaintId is not null)
             throw new ArgumentException("Only one of SubscriptionId or ComplaintId can be provided.");
 
-        return await _repo.CreateAsync(dto);
+        int newId = await _repo.CreateAsync(dto);
+
+        return ApiResponse<int>.SuccessResponse(
+            newId,
+            "Service task created successfully."
+        );
     }
 
-    public async Task<IEnumerable<dynamic>> GetAllAsync()
+    public async Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync()
     {
-        return await _repo.GetAllAsync();
+        var list = await _repo.GetAllAsync();
+
+        return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+            200,
+            "Tasks fetched successfully.",
+            list
+        );
     }
 
-    public async Task<dynamic?> GetByIdAsync(int id)
+    public async Task<ApiResponse<dynamic?>> GetByIdAsync(int id)
     {
         if (id <= 0)
-            throw new ArgumentException("Invalid Id");
+            throw new ArgumentException("Invalid Id.");
 
-        return await _repo.GetByIdAsync(id);
+        var data = await _repo.GetByIdAsync(id);
+
+        if (data == null)
+            throw new KeyNotFoundException("Service task not found.");
+
+        return ApiResponse<dynamic?>.SuccessResponse(
+            200,
+            "Task fetched successfully.",
+            data
+        );
     }
 
-    public async Task<int> UpdateAsync(ServiceTaskUpdateDto dto)
+    public async Task<ApiResponse<bool>> UpdateAsync(ServiceTaskUpdateDto dto)
     {
         if (dto.Id <= 0)
             throw new ArgumentException("Task Id required.");
 
-        return await _repo.UpdateAsync(dto);
+        int response = await _repo.UpdateAsync(dto);
+
+        //if (rows <= 0)
+        //    throw new Exception("Failed to update service task.");
+
+        return ApiResponse<bool>.SuccessResponse(
+            200,
+            "Service task updated successfully."
+        );
     }
 
-    public async Task<int> UpdateStatusAsync(ServiceTaskUpdateStatusDto dto)
+
+    public async Task<ApiResponse<bool>> UpdateStatusAsync(ServiceTaskUpdateStatusDto dto)
     {
         if (dto.Id <= 0)
             throw new ArgumentException("Task Id required.");
 
-        return await _repo.UpdateStatusAsync(dto);
+        int response = await _repo.UpdateStatusAsync(dto);
+
+        //if (rows <= 0)
+        //    throw new Exception("Failed to update task status.");
+
+        return ApiResponse<bool>.SuccessResponse(
+            200,
+            "Task status updated successfully."
+        );
     }
 
-    public async Task<int> DeleteAsync(int id, int actionUserId)
+    public async Task<ApiResponse<bool>> DeleteAsync(int id, int actionUserId)
     {
         if (id <= 0)
-            throw new ArgumentException("Invalid Id");
+            throw new ArgumentException("Invalid Id.");
 
-        return await _repo.DeleteAsync(id, actionUserId);
+        int response = await _repo.DeleteAsync(id, actionUserId);
+
+        //if (rows <= 0)
+        //    throw new Exception("Failed to delete service task.");
+
+        return ApiResponse<bool>.SuccessResponse(
+            200,
+            "Service task deleted successfully."
+        );
     }
 
-    public async Task<IEnumerable<dynamic>> GetTasksByCustomerAsync(int actionUserId)
+
+    public async Task<ApiResponse<IEnumerable<dynamic>>> GetTasksByCustomerAsync(int actionUserId)
     {
         if (actionUserId <= 0)
-            throw new ArgumentException("Invalid ActionUserId");
+            throw new ArgumentException("Invalid ActionUserId.");
 
-        return await _repo.GetTasksByCustomerAsync(actionUserId);
+        var data = await _repo.GetTasksByCustomerAsync(actionUserId);
+
+        return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+            200,
+            "Customer tasks fetched successfully.",
+            data
+        );
     }
 
-    public async Task<IEnumerable<dynamic>> GetTasksByStatusAsync(ServiceTaskStatus status)
+    public async Task<ApiResponse<IEnumerable<dynamic>>> GetTasksByStatusAsync(ServiceTaskStatus status)
     {
-        return await _repo.GetTasksByStatusAsync(status.ToString());
+        var data = await _repo.GetTasksByStatusAsync(status.ToString());
+
+        return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+            200,
+            "Tasks fetched successfully.",
+            data
+        );
     }
 
-    public async Task<IEnumerable<dynamic>> GetTasksByTechnicianAsync(int employeeId)
+    public async Task<ApiResponse<IEnumerable<dynamic>>> GetTasksByTechnicianAsync(int employeeId)
     {
         if (employeeId <= 0)
-            throw new ArgumentException("Invalid EmployeeId");
+            throw new ArgumentException("Invalid EmployeeId.");
 
-        return await _repo.GetTasksByTechnicianAsync(employeeId);
+        var list = await _repo.GetTasksByTechnicianAsync(employeeId);
+
+        return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+            200,
+            "Technician tasks fetched successfully.",
+            list
+        );
     }
 
-    public async Task<IEnumerable<dynamic>> GetTasksBySubscriptionIdAsync(int subscriptionId)
+    public async Task<ApiResponse<IEnumerable<dynamic>>> GetTasksBySubscriptionIdAsync(int subscriptionId)
     {
         if (subscriptionId <= 0)
-            throw new ArgumentException("Invalid SubscriptionId");
+            throw new ArgumentException("Invalid SubscriptionId.");
 
-        return await _repo.GetTasksBySubscriptionIdAsync(subscriptionId);
+        var list = await _repo.GetTasksBySubscriptionIdAsync(subscriptionId);
+
+        return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+            200,
+            "Subscription tasks fetched successfully.",
+            list
+        );
     }
 }

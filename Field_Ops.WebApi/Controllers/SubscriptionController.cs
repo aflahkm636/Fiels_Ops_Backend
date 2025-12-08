@@ -1,7 +1,7 @@
 ﻿using Field_ops.Domain.Enums;
 using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
-using Field_Ops.Application.DTO;
+using Field_Ops.Application.DTO.SubscriptionDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,28 +9,36 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ServiceTasksController : ControllerBase
+public class SubscriptionsController : ControllerBase
 {
-    private readonly IServiceTasksService _serviceTasksService;
-    private readonly IEmployeesRepository _empRepo;
+    private readonly ISubscriptionService _service;
+    private readonly IEmployeesRepository _emprepo;
 
-    public ServiceTasksController(IServiceTasksService service, IEmployeesRepository employeesRepo)
+    public SubscriptionsController(ISubscriptionService service, IEmployeesRepository emprepo)
     {
-        _service=service;
-        _empRepo = employeesRepo;
+        _service = service;
+        _emprepo = emprepo;
     }
 
+    private async Task<(string role, int departmentId, int userId)> GetUserContext()
+    {
+        var user = User.GetUser();
+        int deptId = await _emprepo.DepartmentIdByUSerID(user.UserId);
+        return (user.Role, deptId, user.UserId);
+    }
 
     [HttpPost]
-    [Authorize(Roles = "Staff,Admin")]
-    public async Task<IActionResult> Create([FromBody] ServiceTaskCreateDto dto)
+    public async Task<IActionResult> Create([FromBody] SubscriptionCreateDto dto)
+
     {
         try
         {
-            dto.ActionUserId = User.GetUserId();
+            var (role, deptId, userId) = await GetUserContext();
 
-            var result = await _service.CreateAsync(dto);
-            return StatusCode(200, new { TaskId = result });
+            dto.CreatedBy = userId;
+
+            var result = await _service.CreateAsync(dto, role, deptId);
+            return StatusCode(result.StatusCode, result);
         }
         catch (Exception ex)
         {
@@ -40,13 +48,15 @@ public class ServiceTasksController : ControllerBase
 
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Staff")]
+
     public async Task<IActionResult> GetAll()
     {
         try
         {
-            var result = await _service.GetAllAsync();
-            return StatusCode(200, result);
+            var (role, deptId, _) = await GetUserContext();
+
+            var result = await _service.GetAllAsync(role, deptId);
+            return StatusCode(result.StatusCode, result);
         }
         catch (Exception ex)
         {
@@ -54,19 +64,20 @@ public class ServiceTasksController : ControllerBase
         }
     }
 
- 
-    [HttpGet("{id:int}")]
-    [Authorize(Roles = "Admin,Staff,Technician")]
+    [HttpGet("{id}")]
+
+
     public async Task<IActionResult> GetById(int id)
     {
         try
         {
-            var result = await _service.GetByIdAsync(id);
+            var (role, deptId, _) = await GetUserContext();
 
-            if (result == null)
-                return StatusCode(404, new { Message = "Task not found" });
 
-            return StatusCode(200, result);
+
+
+            var result = await _service.GetByIdAsync(id, role, deptId);
+            return StatusCode(result.StatusCode, result);
         }
         catch (Exception ex)
         {
@@ -74,22 +85,22 @@ public class ServiceTasksController : ControllerBase
         }
     }
 
+    [HttpGet("by-customer/{customerId}")]
+    public async Task<IActionResult> GetByCustomerId(int customerId)
 
-    [HttpPut("{id:int}")]
-    [Authorize(Roles = "Staff,Admin")]
-    public async Task<IActionResult> Update(int id, [FromBody] ServiceTaskUpdateDto dto)
+
     {
         try
         {
-            dto.Id = id;
-            dto.ActionUserId = User.GetUserId();
+            var (role, deptId, _) = await GetUserContext();
 
-            var rows = await _service.UpdateAsync(dto);
 
-            if (rows > 0)
-                return StatusCode(200, new { Updated = true });
+            var result = await _service.GetByCustomerIdAsync(customerId, role, deptId);
+            return StatusCode(result.StatusCode, result);
 
-            return StatusCode(400, new { Message = "Update failed" });
+
+
+
         }
         catch (Exception ex)
         {
@@ -97,22 +108,22 @@ public class ServiceTasksController : ControllerBase
         }
     }
 
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] SubscriptionUpdateDto dto)
 
-    [HttpPatch("{id:int}/status")]
-    [Authorize(Roles = "Staff,Technician,Admin")]
-    public async Task<IActionResult> UpdateStatus(int id, [FromBody] ServiceTaskUpdateStatusDto dto)
+
     {
         try
         {
-            dto.Id = id;
-            dto.ActionUserId = User.GetUserId();
+            var (role, deptId, userId) = await GetUserContext();
+            dto.ModifiedBy = userId;
 
-            var rows = await _service.UpdateStatusAsync(dto);
+            var result = await _service.UpdateAsync(dto, role, deptId);
+            return StatusCode(result.StatusCode, result);
 
-            if (rows > 0)
-                return StatusCode(200, new { Updated = true });
 
-            return StatusCode(400, new { Message = "Status update failed" });
+
+
         }
         catch (Exception ex)
         {
@@ -120,21 +131,21 @@ public class ServiceTasksController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
 
-    [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Staff,Admin")]
+
     public async Task<IActionResult> Delete(int id)
     {
         try
         {
-            int actionUserId = User.GetUserId();
+            var (role, deptId, userId) = await GetUserContext();
 
-            var rows = await _service.DeleteAsync(id, actionUserId);
+            var result = await _service.DeleteAsync(id, userId, role, deptId);
+            return StatusCode(result.StatusCode, result);
 
-            if (rows > 0)
-                return StatusCode(200, new { Deleted = true });
 
-            return StatusCode(400, new { Message = "Delete failed" });
+
+
         }
         catch (Exception ex)
         {
@@ -142,79 +153,24 @@ public class ServiceTasksController : ControllerBase
         }
     }
 
-
-    [HttpGet("customer")]
-    [Authorize(Roles = "Customer")]
-    public async Task<IActionResult> GetTasksForCustomer()
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(
+        int id,
+        [FromQuery] SubscriptionStatus status,
+        [FromQuery] DateTime? endDate = null)
     {
         try
         {
-            int userId = User.GetUserId();
+            var (role, deptId, userId) = await GetUserContext();
 
-            var result = await _service.GetTasksByCustomerAsync(userId);
-            return StatusCode(200, result);
+            var result = await _service.UpdateStatusAsync(id, status, userId, role, deptId, endDate);
+            return StatusCode(result.StatusCode, result);
+
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { Message = ex.Message });
         }
-    }
 
-
-    [HttpGet("status/{status}")]
-    [Authorize(Roles = "Admin,Staff")]
-    public async Task<IActionResult> GetTasksByStatus(ServiceTaskStatus status)
-    {
-        try
-        {
-            var result = await _service.GetTasksByStatusAsync(status);
-            return StatusCode(200, result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
-    }
-
-    [HttpGet("technician")]
-    [Authorize(Roles = "Technician,Admin,Staff")]
-    public async Task<IActionResult> GetTasksByTechnician([FromQuery] int? employeeId)
-    {
-        try
-        {
-            if (employeeId == null)
-            {
-                int userId = User.GetUserId();
-
-                int resolvedEmployeeId = await _empRepo.GetEmployeeIdByUSerID(userId);
-                if (resolvedEmployeeId<0)
-                    return StatusCode(400, new { Message = "EmployeeId could not be resolved for this user." });
-
-                employeeId = resolvedEmployeeId;
-            }
-
-            var result = await _service.GetTasksByTechnicianAsync(employeeId.Value);
-            return StatusCode(200, result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
-    }
-
-
-    [HttpGet("subscription/{subscriptionId:int}")]
-    [Authorize(Roles = "Admin,Staff,Technician")]
-    public async Task<IActionResult> GetTasksBySubscription(int subscriptionId)
-    {
-        try
-        {
-            var result = await _service.GetTasksBySubscriptionIdAsync(subscriptionId);
-            return StatusCode(200, result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
     }
 }

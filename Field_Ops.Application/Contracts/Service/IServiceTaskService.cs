@@ -1,4 +1,5 @@
 ﻿using Field_ops.Domain.Enums;
+using Field_Ops.Application.common;
 using Field_Ops.Application.DTO;
 
 
@@ -8,17 +9,17 @@ namespace Field_Ops.Application.Contracts.Service
 
     public interface IServiceTasksService
     {
-        Task<int> CreateAsync(ServiceTaskCreateDto dto);
-        Task<IEnumerable<dynamic>> GetAllAsync();
-        Task<dynamic?> GetByIdAsync(int id);
-        Task<int> UpdateAsync(ServiceTaskUpdateDto dto);
-        Task<int> UpdateStatusAsync(ServiceTaskUpdateStatusDto dto);
-        Task<int> DeleteAsync(int id, int actionUserId);
+        Task<ApiResponse<int>> CreateAsync(ServiceTaskCreateDto dto);
+        Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync();
+        Task<ApiResponse<dynamic?>> GetByIdAsync(int id);
+        Task<ApiResponse<bool>> UpdateAsync(ServiceTaskUpdateDto dto);
+        Task<ApiResponse<bool>> UpdateStatusAsync(ServiceTaskUpdateStatusDto dto);
+        Task<ApiResponse<bool>> DeleteAsync(int id, int actionUserId);
 
-        Task<IEnumerable<dynamic>> GetTasksByCustomerAsync(int actionUserId);
-        Task<IEnumerable<dynamic>> GetTasksByStatusAsync(ServiceTaskStatus status);
-        Task<IEnumerable<dynamic>> GetTasksByTechnicianAsync(int employeeId);
-        Task<IEnumerable<dynamic>> GetTasksBySubscriptionIdAsync(int subscriptionId);
+        Task<ApiResponse<IEnumerable<dynamic>>> GetTasksByCustomerAsync(int actionUserId);
+        Task <ApiResponse<IEnumerable<dynamic>>> GetTasksByStatusAsync(ServiceTaskStatus status);
+        Task<ApiResponse<IEnumerable<dynamic>>> GetTasksByTechnicianAsync(int employeeId);
+        Task <ApiResponse<IEnumerable<dynamic>>> GetTasksBySubscriptionIdAsync(int subscriptionId);
     }
 
 }

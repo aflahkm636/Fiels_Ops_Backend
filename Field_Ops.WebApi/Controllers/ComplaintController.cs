@@ -119,6 +119,8 @@ public class ComplaintsController : ControllerBase
         }
     }
 
+    [HttpGet("assigned-to-technician")]
+    [Authorize(Roles = "Technician,Admin,Staff")]
     public async Task<IActionResult> GetComplaintsAssignedToTechnicianAsync()
     {
         try

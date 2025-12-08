@@ -2,6 +2,7 @@ using Field_Ops.API.Middleware;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.Settings;
 using Field_Ops.WebApi.Extensions;
+using Hangfire;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,34 @@ builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHangfire(config =>
+{
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+          .UseSimpleAssemblyNameTypeSerializer()
+          .UseRecommendedSerializerSettings()
+          .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddHangfireServer();
+
+// Run Expiry every day at midnight
+RecurringJob.AddOrUpdate<IAutomationService>(
+    "auto-expire",
+    service => service.RunAutoExpire(),
+    Cron.Daily);
+
+// Run auto-renew every day at 00:05
+RecurringJob.AddOrUpdate<IAutomationService>(
+    "auto-renew",
+    service => service.RunAutoRenew(),
+    "5 0 * * *");
+
+// Run Auto Service Due every hour
+RecurringJob.AddOrUpdate<IAutomationService>(
+    "auto-service-due",
+    service => service.RunAutoServiceDue(),
+    Cron.Hourly);
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -67,6 +96,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/automation-dashboard");
 
 app.MapControllers();
 

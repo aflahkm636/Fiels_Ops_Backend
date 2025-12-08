@@ -10,7 +10,7 @@ namespace Field_ops.Domain.Enums
     {
         Active,
         Paused,
-        Expired
+        Expired,
     }
 
 }

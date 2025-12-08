@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Field_Ops.Application.DTO
@@ -14,6 +15,7 @@ namespace Field_Ops.Application.DTO
         public DateTime? TaskDate { get; set; }
         public string? Notes { get; set; }
 
+        [JsonIgnore]
         public int ActionUserId { get; set; }
     }
     public class ServiceTaskUpdateDto
@@ -29,7 +31,7 @@ namespace Field_Ops.Application.DTO
         public int Id { get; set; }
         public ServiceTaskStatus Status { get; set; }
         public string? Notes { get; set; }
-
+        [JsonIgnore]
         public int ActionUserId { get; set; }
         public int? EmployeeId { get; set; }   // required for technician, optional for staff
     }

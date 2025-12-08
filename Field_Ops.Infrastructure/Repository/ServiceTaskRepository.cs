@@ -50,7 +50,7 @@ public class ServiceTasksRepository : IServiceTasksRepository
         var p = new DynamicParameters();
         p.Add("@FLAG", "UPDATESTATUS");
         p.Add("@Id", dto.Id);
-        p.Add("@Status", dto.Status);
+        p.Add("@Status", dto.Status.ToString());
         p.Add("@Notes", dto.Notes);
         p.Add("@ActionUserId", dto.ActionUserId);
         p.Add("@EmployeeId", dto.EmployeeId);
@@ -84,7 +84,7 @@ public class ServiceTasksRepository : IServiceTasksRepository
     {
         var p = new DynamicParameters();
         p.Add("@FLAG", "GETTASKS_BY_STATUS");
-        p.Add("@Status", status);
+        p.Add("@Status", status.ToString());
 
         return await _db.QueryAsync<dynamic>(
             "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
