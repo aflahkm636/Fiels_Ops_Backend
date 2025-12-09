@@ -73,6 +73,14 @@ public class TaskEmployeesService : ITaskEmployeesService
         if (employeeId <= 0) throw new ArgumentException("Invalid EmployeeId.");
 
         var list = await _repo.GetByEmployeeAsync(employeeId);
+        if(list == null)
+        {
+            return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+                        404,
+                        "not found."
+                        
+                    );
+        }
 
         return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
             200,
@@ -86,7 +94,14 @@ public class TaskEmployeesService : ITaskEmployeesService
         if (employeeId <= 0) throw new ArgumentException("Invalid EmployeeId.");
 
         var list = await _repo.GetTasksByTechnicianStatusAsync(employeeId, status);
+        if (list == null)
+        {
+            return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+                        404,
+                        "not found."
 
+                    );
+        }
         return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
             200,
             "Technician tasks fetched successfully.",

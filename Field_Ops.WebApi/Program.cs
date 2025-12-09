@@ -2,6 +2,7 @@ using Field_Ops.API.Middleware;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.Settings;
 using Field_Ops.WebApi.Extensions;
+using Field_Ops.WebApi.Jobs;
 using Hangfire;
 using Microsoft.OpenApi.Models;
 
@@ -26,25 +27,6 @@ builder.Services.AddHangfire(config =>
 });
 
 builder.Services.AddHangfireServer();
-
-// Run Expiry every day at midnight
-RecurringJob.AddOrUpdate<IAutomationService>(
-    "auto-expire",
-    service => service.RunAutoExpire(),
-    Cron.Daily);
-
-// Run auto-renew every day at 00:05
-RecurringJob.AddOrUpdate<IAutomationService>(
-    "auto-renew",
-    service => service.RunAutoRenew(),
-    "5 0 * * *");
-
-// Run Auto Service Due every hour
-RecurringJob.AddOrUpdate<IAutomationService>(
-    "auto-service-due",
-    service => service.RunAutoServiceDue(),
-    Cron.Hourly);
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -98,6 +80,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHangfireDashboard("/automation-dashboard");
+HangfireJobRegistrar.RegisterRecurringJobs();
+
 
 app.MapControllers();
 

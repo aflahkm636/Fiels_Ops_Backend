@@ -14,7 +14,7 @@ namespace Field_Ops.API.Controllers
         {
             _service = service;
         }
-        [Authorize(Roles ="Staff")]
+        [Authorize(Roles ="Staff,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -22,7 +22,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff,Admin")]
         [HttpGet("active")]
         public async Task<IActionResult> GetActive()
         {
@@ -30,7 +30,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Staff")]
+        [Authorize(Roles = "Staff,Admin")]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
