@@ -1,14 +1,11 @@
-﻿using Field_Ops.Application.Contracts.Repository;
+﻿using Field_Ops.Application.common;
+using Field_Ops.Application.Contracts.Repository;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.CustomerDto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Field_Ops.Application.services
+namespace Field_Ops.Application.Service
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _repo;
 
@@ -17,17 +14,46 @@ namespace Field_Ops.Application.services
             _repo = repo;
         }
 
-        public Task RegisterAsync(CustomerRegisterDto dto)
-            => _repo.AddCustomerAsync(dto);
+        public async Task<ApiResponse<IEnumerable<CustomerDto>>> GetAllAsync()
+        {
+            var customers = await _repo.GetAllAsync();
 
-        public Task<IEnumerable<CustomerDto>> GetAllAsync()
-            => _repo.GetAllAsync();
+            return ApiResponse<IEnumerable<CustomerDto>>.SuccessResponse(
+                200,
+                "Customers fetched successfully.",
+                customers
+            );
+        }
 
-        public Task<CustomerDto?> GetByIdAsync(int id)
-            => _repo.GetByIdAsync(id);
 
-        public Task<CustomerDto?> GetByUserIdAsync(int userId)
-            => _repo.GetByUserIdAsync(userId);
+        public async Task<ApiResponse<CustomerDto?>> GetByIdAsync(int id)
+        {
+            if (id <= 0) throw new ArgumentException("Invalid Customer Id.");
+
+            var customer = await _repo.GetByIdAsync(id);
+
+            return ApiResponse<CustomerDto?>.SuccessResponse(
+                200,
+                customer != null ? "Customer fetched successfully." : "Customer not found.",
+                customer
+            );
+        }
+
+
+        public async Task<ApiResponse<CustomerDto?>> GetByUserIdAsync(int userId)
+        {
+            if (userId <= 0) throw new ArgumentException("Invalid UserId.");
+
+            var customer = await _repo.GetByUserIdAsync(userId);
+
+            return ApiResponse<CustomerDto?>.SuccessResponse(
+                200,
+                customer != null ? "Customer fetched successfully." : "Customer not found.",
+                customer
+            );
+        }
+
+
+       
     }
-
 }
