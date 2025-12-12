@@ -19,7 +19,7 @@ public class InventoryController : ControllerBase
 
     [HttpPost("create")]
     [Authorize(Roles = "Staff,Admin")]
-    public async Task<IActionResult> Create([FromBody] ProductCreateDto dto)
+    public async Task<IActionResult> Create([FromForm] ProductCreateDto dto)
     {
         try
         {
@@ -37,7 +37,7 @@ public class InventoryController : ControllerBase
    
     [HttpPut("update")]
     [Authorize(Roles = "Staff,Admin")]
-    public async Task<IActionResult> Update([FromBody] ProductUpdateDto dto)
+    public async Task<IActionResult> Update([FromForm] ProductUpdateDto dto)
     {
         try
         {

@@ -1,5 +1,6 @@
 using Field_Ops.API.Middleware;
 using Field_Ops.Application.Contracts.Service;
+using Field_Ops.Application.Helper;
 using Field_Ops.Application.Settings;
 using Field_Ops.WebApi.Extensions;
 using Field_Ops.WebApi.Jobs;
@@ -25,6 +26,11 @@ builder.Services.AddHangfire(config =>
           .UseRecommendedSerializerSettings()
           .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings")
+);
+
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 builder.Services.AddHangfireServer();
 

@@ -16,15 +16,24 @@ namespace Field_Ops.Application.Services
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IEmailService _emailService;
         private readonly IEmployeesRepository _employeesRepository;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public AuthService(ICustomerRepository customerRepository , IUsersRepository usersRepository ,IJwtTokenService jwtTokenService  ,IEmailService emailService ,IEmployeesRepository employeesRepository)
+        public AuthService(
+            ICustomerRepository customerRepository,
+            IUsersRepository usersRepository,
+            IJwtTokenService jwtTokenService,
+            IEmailService emailService,
+            IEmployeesRepository employeesRepository,
+            ICloudinaryService cloudinaryService)
         {
             _customerRepository = customerRepository;
             _usersRepository = usersRepository;
             _jwtTokenService = jwtTokenService;
             _emailService = emailService;
             _employeesRepository = employeesRepository;
+            _cloudinaryService = cloudinaryService;
         }
+
 
         public async Task<ApiResponse<bool>> RegisterUserAsync(CustomerRegisterDto dto)
         {
@@ -36,6 +45,22 @@ namespace Field_Ops.Application.Services
 
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword);
             dto.PasswordHash = hashedPassword;
+            if (dto.ProfileImageFile != null)
+            {
+                using var stream = dto.ProfileImageFile.OpenReadStream();
+
+                var cloudResult = await _cloudinaryService.UploadImageAsync(
+                    stream,
+                    dto.ProfileImageFile.FileName,
+                    "Field_Ops/customers"
+                );
+
+                dto.ProfileImage = cloudResult.Url;
+            }
+            else
+            {
+                dto.ProfileImage = null; 
+            }
 
             var isCreated = await _customerRepository.AddCustomerAsync(dto);
 
@@ -82,6 +107,22 @@ namespace Field_Ops.Application.Services
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword);
 
             dto.Password = hashedPassword;
+            if (dto.ProfileImageFile != null)
+            {
+                using var stream = dto.ProfileImageFile.OpenReadStream();
+
+                var cloudResult = await _cloudinaryService.UploadImageAsync(
+                    stream,
+                    dto.ProfileImageFile.FileName,
+                    "Field_Ops/employees"
+                );
+
+                dto.ProfileImage = cloudResult.Url;
+            }
+            else
+            {
+                dto.ProfileImage = null; 
+            }
 
             var isCreated = await _employeesRepository.CreateEmployeeAsync(dto);
 

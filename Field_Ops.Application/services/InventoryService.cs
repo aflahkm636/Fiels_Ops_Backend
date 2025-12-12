@@ -6,10 +6,12 @@ using Field_Ops.Application.DTO.InventoryDto;
 public class InventoryService : IInventoryService
 {
     private readonly IProductsRepository _repo;
+    private readonly ICloudinaryService _cloudinaryService;
 
-    public InventoryService(IProductsRepository repo)
+    public InventoryService(IProductsRepository repo, ICloudinaryService cloudinaryService)
     {
         _repo = repo;
+        _cloudinaryService = cloudinaryService;
     }
 
     public async Task<ApiResponse<int>> CreateAsync(ProductCreateDto dto)
@@ -21,11 +23,28 @@ public class InventoryService : IInventoryService
         if (dto.ReorderLevel < 0) throw new ArgumentException("Invalid ReorderLevel.");
         if (dto.ActionUserId <= 0) throw new ArgumentException("Invalid ActionUserId.");
 
-        int id = await _repo.CreateAsync(dto);
+
+        if (dto.ProductImageFile != null)
+        {
+            using var stream = dto.ProductImageFile.OpenReadStream();
+
+            var cloudResult = await _cloudinaryService.UploadImageAsync(
+                stream,
+                dto.ProductImageFile.FileName,
+                "Field_Ops/products"
+            );
+
+            dto.ProductImage = cloudResult.Url;
+        }
+        else
+        {
+            dto.ProductImage = null;
+        }
+
+            int id = await _repo.CreateAsync(dto);
 
         return ApiResponse<int>.SuccessResponse(200, "Product created successfully.", id);
     }
-
 
     public async Task<ApiResponse<bool>> UpdateAsync(ProductUpdateDto dto)
     {
@@ -33,15 +52,40 @@ public class InventoryService : IInventoryService
         if (dto.Id <= 0) throw new ArgumentException("Invalid Id.");
         if (dto.ActionUserId <= 0) throw new ArgumentException("Invalid ActionUserId.");
 
+        var existing = await _repo.GetByIdAsync(dto.Id);
+        if (existing == null)
+            throw new ArgumentException("Product not found.");
+
+        string? oldImage = existing.ProductImage; 
+
+        if (dto.ProductImageFile != null)
+        {
+            using var stream = dto.ProductImageFile.OpenReadStream();
+
+            var cloudResult = await _cloudinaryService.UploadImageAsync(
+                stream,
+                dto.ProductImageFile.FileName,
+                "Field_Ops/products"
+            );
+
+            dto.ProductImage = cloudResult.Url;
+
+            if (!string.IsNullOrWhiteSpace(oldImage))
+            {
+                string publicId = ExtractPublicId(oldImage);
+                await _cloudinaryService.DeleteImageAsync(publicId);
+            }
+        }
+        else
+        {
+            dto.ProductImage = oldImage; 
+        }
+
         int result = await _repo.UpdateAsync(dto);
 
-
-        return ApiResponse<bool>.SuccessResponse(
-            200,
-            "Product updated successfully." 
-         
-        );
+        return ApiResponse<bool>.SuccessResponse(200, "Product updated successfully.", true);
     }
+
 
 
     public async Task<ApiResponse<bool>> DeleteAsync(int id, int actionUserId)
@@ -131,4 +175,14 @@ public class InventoryService : IInventoryService
 
         return ApiResponse<decimal>.SuccessResponse(200, "Total inventory value calculated.", value);
     }
+
+    private string ExtractPublicId(string url)
+    {
+        var parts = url.Split('/');
+        var fileName = parts[^1];    
+        var folder = parts[^2];        
+
+        return $"Field_Ops/{folder}/{fileName.Split('.')[0]}";
+    }
+
 }

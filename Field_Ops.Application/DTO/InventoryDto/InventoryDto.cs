@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace Field_Ops.Application.DTO.InventoryDto
         public decimal Price { get; set; }
         public int QuantityInStock { get; set; }
         public int ReorderLevel { get; set; }
+        public IFormFile? ProductImageFile { get; set; }  
         public string? ProductImage { get; set; }
         public int ActionUserId { get; set; }
     }
@@ -25,6 +27,7 @@ namespace Field_Ops.Application.DTO.InventoryDto
         public string? Category { get; set; }
         public decimal? Price { get; set; }
         public int? ReorderLevel { get; set; }
+        public IFormFile? ProductImageFile { get; set; }  
         public string? ProductImage { get; set; }
         public int ActionUserId { get; set; }
     }

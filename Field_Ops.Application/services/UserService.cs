@@ -10,11 +10,13 @@ namespace Field_Ops.Application.Services
     {
         private readonly IUsersRepository _repo;
         private readonly IEmailService _emailService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public UserService(IUsersRepository repo, IEmailService emailService)
+        public UserService(IUsersRepository repo, IEmailService emailService, ICloudinaryService cloudinaryService)
         {
             _repo = repo;
             _emailService = emailService;
+            _cloudinaryService = cloudinaryService;
         }
 
 
@@ -50,12 +52,38 @@ namespace Field_Ops.Application.Services
             if (existing == null)
                 return ApiResponse<bool>.FailResponse(404, "User not found");
 
+            string? oldImage = existing.ProfileImage; 
+
+            if (dto.ProfileImageFile != null)
+            {
+                using var stream = dto.ProfileImageFile.OpenReadStream();
+
+                var cloudResult = await _cloudinaryService.UploadImageAsync(
+                    stream,
+                    dto.ProfileImageFile.FileName,
+                    "smartserve/users"
+                );
+
+                dto.ProfileImage = cloudResult.Url;
+
+                if (!string.IsNullOrEmpty(oldImage))
+                {
+                    string publicId = ExtractPublicId(oldImage);
+                    await _cloudinaryService.DeleteImageAsync(publicId);
+                }
+            }
+            else
+            {
+                dto.ProfileImage = oldImage;
+            }
+
             var ok = await _repo.UpdateProfileAsync(dto);
 
             return ok
                 ? ApiResponse<bool>.SuccessResponse(200, "Profile updated successfully", true)
                 : ApiResponse<bool>.FailResponse(400, "Failed to update profile");
         }
+
 
         public async Task<ApiResponse<bool>> UpdateUserRoleAsync(UserRoleUpdateDto dto)
         {
@@ -164,5 +192,15 @@ namespace Field_Ops.Application.Services
 
             return new ApiResponse<string>(200, "Password reset successful.");
         }
+        private string ExtractPublicId(string url)
+        {
+
+            var parts = url.Split('/');
+            var fileName = parts[^1];              
+            var folder = parts[^2];                  
+
+            return $"smartserve/{folder}/{fileName.Split('.')[0]}";
+        }
+
     }
 }

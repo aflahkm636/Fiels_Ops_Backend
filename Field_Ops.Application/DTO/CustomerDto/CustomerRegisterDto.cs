@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,10 @@ namespace Field_Ops.Application.DTO.CustomerDto
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string? Phone { get; set; }
-    public string? PasswordHash { get; set; } 
+    public string? PasswordHash { get; set; }
+
+    public IFormFile? ProfileImageFile { get; set; }  
+    public string? ProfileImage { get; set; }
     public string? Address { get; set; }
     public string? City { get; set; }
     public string? Pincode { get; set; }

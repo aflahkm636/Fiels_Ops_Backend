@@ -23,7 +23,7 @@ namespace Field_Ops.Api.Controllers
 
         [Authorize(Roles = "Admin,Staff")]
         [HttpPost("customer")]
-        public async Task<IActionResult> Register([FromBody] CustomerRegisterDto dto)
+        public async Task<IActionResult> Register([FromForm] CustomerRegisterDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

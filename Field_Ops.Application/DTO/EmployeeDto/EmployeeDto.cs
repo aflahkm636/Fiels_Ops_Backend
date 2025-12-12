@@ -1,4 +1,5 @@
 ﻿using Field_ops.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using System.Text.Json.Serialization;
 
 
@@ -10,7 +11,8 @@ namespace Field_Ops.Application.DTO.EmployeeDto
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Password{ get; set; }
-        public Roles Role { get; set; }  
+        public Roles Role { get; set; }
+        public IFormFile? ProfileImageFile { get; set; }  
         public string? ProfileImage { get; set; }
 
         public string? Designation { get; set; }

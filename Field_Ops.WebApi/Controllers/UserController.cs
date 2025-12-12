@@ -55,7 +55,7 @@ namespace Field_Ops.API.Controllers
 
         [Authorize]
         [HttpPut("profile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] UserProfileUpdateDto dto)
+        public async Task<IActionResult> UpdateProfile([FromForm] UserProfileUpdateDto dto)
         {
             dto.Id = User.GetUserId();
             dto.ModifiedBy = User.GetUserId();

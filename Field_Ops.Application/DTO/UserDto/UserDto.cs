@@ -1,4 +1,5 @@
 ﻿using Field_ops.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,8 @@ namespace Field_Ops.Application.DTO.UserDto
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Phone { get; set; }
+        public IFormFile? ProfileImageFile { get; set; } 
+
         public string? ProfileImage { get; set; }
         [JsonIgnore]
         public int ModifiedBy { get; set; }
