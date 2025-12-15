@@ -24,6 +24,8 @@ namespace Field_Ops.Application.DTO
         public DateTime? TaskDate { get; set; }
         public string? Notes { get; set; }
 
+        public bool? RequiresMaterialUsage { get; set; }
+
         public int ActionUserId { get; set; }
     }
     public class ServiceTaskUpdateStatusDto

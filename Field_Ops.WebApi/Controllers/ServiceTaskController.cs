@@ -92,8 +92,8 @@ public class ServiceTasksController : ControllerBase
         try
         {
 
-            //dto.ActionUserId = User.GetUserId();
-            dto.ActionUserId = 3;
+            dto.ActionUserId = User.GetUserId();
+            //dto.ActionUserId = 3;
 
             var response = await _service.UpdateStatusAsync(dto);
             return StatusCode(response.StatusCode, response);

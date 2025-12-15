@@ -107,11 +107,16 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@Id", dto.Id);
         p.Add("@TaskDate", dto.TaskDate);
         p.Add("@Notes", dto.Notes);
+        p.Add("@RequiresMaterialUsage", dto.RequiresMaterialUsage);
         p.Add("@ActionUserId", dto.ActionUserId);
 
         return await _db.QueryFirstAsync<int>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
 
     public async Task<IEnumerable<dynamic>> GetTasksBySubscriptionIdAsync(int subscriptionId)
     {
@@ -122,4 +127,18 @@ public class ServiceTasksRepository : IServiceTasksRepository
         return await _db.QueryAsync<dynamic>(
             "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
     }
+
+    public async Task<IEnumerable<dynamic>> GetAwaitingApprovalTasksAsync(int actionUserId)
+    {
+        var p = new DynamicParameters();
+        p.Add("@FLAG", "GET_AWAITING_APPROVAL");
+        p.Add("@ActionUserId", actionUserId);
+
+        return await _db.QueryAsync<dynamic>(
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
+    }
+
 }
