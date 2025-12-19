@@ -24,9 +24,11 @@ public class ServiceTasksService : IServiceTasksService
         int newId = await _repo.CreateAsync(dto);
 
         return ApiResponse<int>.SuccessResponse(
-            newId,
-            "Service task created successfully."
-        );
+        201,
+        "Service task created successfully.",
+        newId
+    );
+
     }
 
     public async Task<ApiResponse<IEnumerable<dynamic>>> GetAllAsync()
@@ -159,4 +161,19 @@ public class ServiceTasksService : IServiceTasksService
             list
         );
     }
+
+    public async Task<ApiResponse<IEnumerable<dynamic>>> GetAwaitingApprovalAsync(int actionUserId)
+    {
+        if (actionUserId <= 0)
+            throw new ArgumentException("Invalid ActionUserId.");
+
+        var data = await _repo.GetAwaitingApprovalTasksAsync(actionUserId);
+
+        return ApiResponse<IEnumerable<dynamic>>.SuccessResponse(
+            200,
+            "Awaiting approval tasks fetched successfully.",
+            data
+        );
+    }
+
 }

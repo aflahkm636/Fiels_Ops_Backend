@@ -31,19 +31,12 @@ public class SubscriptionsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] SubscriptionCreateDto dto)
 
     {
-        try
-        {
-            var (role, deptId, userId) = await GetUserContext();
+          var (role, deptId, userId) = await GetUserContext();
 
             dto.CreatedBy = userId;
 
             var result = await _service.CreateAsync(dto, role, deptId);
             return StatusCode(result.StatusCode, result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
     }
 
 
@@ -51,17 +44,12 @@ public class SubscriptionsController : ControllerBase
 
     public async Task<IActionResult> GetAll()
     {
-        try
-        {
+        
             var (role, deptId, _) = await GetUserContext();
 
             var result = await _service.GetAllAsync(role, deptId);
             return StatusCode(result.StatusCode, result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
+
     }
 
     [HttpGet("{id}")]
@@ -69,8 +57,6 @@ public class SubscriptionsController : ControllerBase
 
     public async Task<IActionResult> GetById(int id)
     {
-        try
-        {
             var (role, deptId, _) = await GetUserContext();
 
 
@@ -78,99 +64,52 @@ public class SubscriptionsController : ControllerBase
 
             var result = await _service.GetByIdAsync(id, role, deptId);
             return StatusCode(result.StatusCode, result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
+
     }
 
     [HttpGet("by-customer/{customerId}")]
     public async Task<IActionResult> GetByCustomerId(int customerId)
-
-
     {
-        try
-        {
             var (role, deptId, _) = await GetUserContext();
 
 
             var result = await _service.GetByCustomerIdAsync(customerId, role, deptId);
             return StatusCode(result.StatusCode, result);
 
-
-
-
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
     }
 
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] SubscriptionUpdateDto dto)
-
-
     {
-        try
-        {
             var (role, deptId, userId) = await GetUserContext();
             dto.ModifiedBy = userId;
 
             var result = await _service.UpdateAsync(dto, role, deptId);
             return StatusCode(result.StatusCode, result);
 
-
-
-
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
     }
 
-    [HttpDelete("{id}")]
 
-
-    public async Task<IActionResult> Delete(int id)
+    [HttpPut("{id}/pause")]
+    public async Task<IActionResult> Pause(int id)
     {
-        try
-        {
-            var (role, deptId, userId) = await GetUserContext();
-
-            var result = await _service.DeleteAsync(id, userId, role, deptId);
-            return StatusCode(result.StatusCode, result);
-
-
-
-
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
+        var (role, deptId, userId) = await GetUserContext();
+        var result = await _service.PauseAsync(id, userId, role, deptId);
+        return StatusCode(result.StatusCode, result);
     }
-
-    [HttpPut("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(
-        int id,
-        [FromQuery] SubscriptionStatus status,
-        [FromQuery] DateTime? endDate = null)
+    [HttpPut("{id}/resume")]
+    public async Task<IActionResult> Resume(int id)
     {
-        try
-        {
-            var (role, deptId, userId) = await GetUserContext();
-
-            var result = await _service.UpdateStatusAsync(id, status, userId, role, deptId, endDate);
-            return StatusCode(result.StatusCode, result);
-
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { Message = ex.Message });
-        }
-
+        var (role, deptId, userId) = await GetUserContext();
+        var result = await _service.ResumeAsync(id, userId, role, deptId);
+        return StatusCode(result.StatusCode, result);
     }
+    [HttpPut("{id}/cancel")]
+    public async Task<IActionResult> Cancel(int id)
+    {
+        var (role, deptId, userId) = await GetUserContext();
+        var result = await _service.CancelAsync(id, userId, role, deptId);
+        return StatusCode(result.StatusCode, result);
+    }
+
 }

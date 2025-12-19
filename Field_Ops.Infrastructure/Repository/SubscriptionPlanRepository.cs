@@ -1,12 +1,7 @@
 ﻿using Dapper;
 using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.DTO.SubscriptionPlanDto;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Field_Ops.Infrastructure.Repository
 {
@@ -25,17 +20,17 @@ namespace Field_Ops.Infrastructure.Repository
             p.Add("@FLAG", "CREATE");
             p.Add("@Name", dto.Name);
             p.Add("@Description", dto.Description);
-            p.Add("@FrequencyInDays", dto.FrequencyInDays);
-            p.Add("@MonthlyCharge", dto.MonthlyCharge);
+            p.Add("@ServiceFrequencyInDays", dto.ServiceFrequencyInDays);
+            p.Add("@BillingCycleInMonths", dto.BillingCycleInMonths);
+            p.Add("@PricePerCycle", dto.PricePerCycle);
+            p.Add("@IsActive", dto.IsActive);
             p.Add("@CreatedBy", dto.CreatedBy);
 
-            var result = await _db.QueryFirstOrDefaultAsync<int>(
+            return await _db.QuerySingleAsync<int>(
                 "SP_SUBSCRIPTIONPLANS",
                 p,
                 commandType: CommandType.StoredProcedure
             );
-
-            return result; 
         }
 
         public async Task<IEnumerable<dynamic>> GetAllAsync()
@@ -43,38 +38,36 @@ namespace Field_Ops.Infrastructure.Repository
             var p = new DynamicParameters();
             p.Add("@FLAG", "GETALL");
 
-            return await _db.QueryAsync<dynamic>(
+            return await _db.QueryAsync(
                 "SP_SUBSCRIPTIONPLANS",
                 p,
                 commandType: CommandType.StoredProcedure
             );
         }
 
-        public async Task<dynamic> GetByIdAsync(int id)
+        public async Task<dynamic?> GetByIdAsync(int id)
         {
             var p = new DynamicParameters();
             p.Add("@FLAG", "GETBYID");
             p.Add("@Id", id);
 
-            var result = await _db.QueryFirstOrDefaultAsync<dynamic>(
+            return await _db.QueryFirstOrDefaultAsync(
                 "SP_SUBSCRIPTIONPLANS",
                 p,
                 commandType: CommandType.StoredProcedure
             );
-
-            return result;
         }
-
 
         public async Task<bool> UpdateAsync(SubscriptionPlanUpdateDto dto)
         {
             var p = new DynamicParameters();
             p.Add("@FLAG", "UPDATE");
             p.Add("@Id", dto.Id);
-            p.Add("@Name", dto.Name);
             p.Add("@Description", dto.Description);
-            p.Add("@FrequencyInDays", dto.FrequencyInDays);
-            p.Add("@MonthlyCharge", dto.MonthlyCharge);
+            p.Add("@ServiceFrequencyInDays", dto.ServiceFrequencyInDays);
+            p.Add("@BillingCycleInMonths", dto.BillingCycleInMonths);
+            p.Add("@PricePerCycle", dto.PricePerCycle);
+            p.Add("@IsActive", dto.IsActive);
             p.Add("@ModifiedBy", dto.ModifiedBy);
 
             var rows = await _db.ExecuteAsync(
@@ -102,5 +95,4 @@ namespace Field_Ops.Infrastructure.Repository
             return rows > 0;
         }
     }
-
 }

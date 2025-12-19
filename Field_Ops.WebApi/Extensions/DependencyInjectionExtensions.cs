@@ -40,6 +40,7 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<IAutomationRepository, AutomationRepository>();
             services.AddScoped<IProductsRepository, ProductsRepository>();
             services.AddScoped<IMaterialUsageRepository, MaterialUsageRepository>();
+            services.AddScoped<IBillingRepository, BillingRepository>();
             
 
             services.AddScoped<IAuthService, AuthService>();
@@ -56,6 +57,7 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<IAutomationService, AutomationService>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IMaterialUsageService, MaterialUsageService>();
+
 
             return services;
         }

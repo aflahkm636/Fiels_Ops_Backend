@@ -15,6 +15,7 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<IEnumerable<dynamic>> GetTasksByTechnicianAsync(int employeeId);
         Task<int> UpdateAsync(ServiceTaskUpdateDto dto);
         Task<IEnumerable<dynamic>> GetTasksBySubscriptionIdAsync(int subscriptionId);
+        Task<IEnumerable<dynamic>> GetAwaitingApprovalTasksAsync(int actionUserId);
     }
 
 }

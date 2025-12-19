@@ -21,15 +21,14 @@ namespace Field_Ops.Application.Contracts.Service
 
         Task<ApiResponse<bool>> UpdateAsync(SubscriptionUpdateDto dto, string role, int departmentId);
 
-        Task<ApiResponse<bool>> DeleteAsync(int id, int deletedBy, string role, int departmentId);
+        //Task<ApiResponse<bool>> DeleteAsync(int id, int deletedBy, string role, int departmentId);
 
-        Task<ApiResponse<bool>> UpdateStatusAsync(
-            int id,
-            SubscriptionStatus status,
-            int userId,
-            string role,
-            int departmentId,
-            DateTime? endDate = null);
+        Task<ApiResponse<bool>> PauseAsync(
+         int id, int userId, string role, int departmentId);
+        Task<ApiResponse<bool>> ResumeAsync(
+        int id, int userId, string role, int departmentId);
+        Task<ApiResponse<bool>> CancelAsync(
+        int id, int userId, string role, int departmentId);
     }
 
 }

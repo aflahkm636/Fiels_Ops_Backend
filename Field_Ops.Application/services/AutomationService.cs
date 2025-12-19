@@ -1,39 +1,21 @@
 ﻿using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Field_Ops.Application.services
+namespace Field_Ops.Application.Services
 {
     public class AutomationService : IAutomationService
     {
         private readonly IAutomationRepository _repo;
+        private readonly IBillingRepository _billingRepo;
 
-        public AutomationService(IAutomationRepository repo)
+        public AutomationService(
+            IAutomationRepository repo,
+            IBillingRepository billingRepo)
         {
             _repo = repo;
+            _billingRepo = billingRepo;
         }
 
-        public async Task RunAutoExpire()
-        {
-            var list = await _repo.GetSubscriptionsToExpireAsync();
-            foreach (var item in list)
-            {
-                await _repo.AutoExpireAsync((int)item.Id, modifiedBy: 1);
-            }
-        }
-
-        public async Task RunAutoRenew()
-        {
-            var list = await _repo.GetSubscriptionsToRenewAsync();
-            foreach (var item in list)
-            {
-                await _repo.AutoRenewAsync((int)item.Id, modifiedBy: 1);
-            }
-        }
 
         public async Task RunAutoServiceDue()
         {
@@ -41,14 +23,39 @@ namespace Field_Ops.Application.services
 
             foreach (var item in list)
             {
-                int subId = (int)item.Id;
-
-                await _repo.MarkServiceDueAsync(subId,1);
-
                 await _repo.AutoCreateServiceTaskAsync(
-                    subscriptionId: subId,
-                    notes: "Auto-generated service task (Service Due)"
+                    subscriptionId: (int)item.Id,
+                    notes: "Auto-created service task (Scheduled)"
                 );
+            }
+        }
+
+
+
+        public async Task RunMonthlyBilling()
+        {
+            var billMonth = new DateTime(
+                DateTime.UtcNow.Year,
+                DateTime.UtcNow.Month,
+                1
+            );
+
+            var subs = await _repo.GetSubscriptionsForBillingAsync(billMonth);
+
+            foreach (var sub in subs)
+            {
+                try
+                {
+                    await _billingRepo.GenerateAsync(
+                        subscriptionId: (int)sub.Id,
+                        billMonth: billMonth,
+                        systemUserId: 1
+                    );
+                }
+                catch
+                {
+                    // log & continue
+                }
             }
         }
     }

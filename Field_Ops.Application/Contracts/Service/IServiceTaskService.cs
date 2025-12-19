@@ -20,6 +20,8 @@ namespace Field_Ops.Application.Contracts.Service
         Task <ApiResponse<IEnumerable<dynamic>>> GetTasksByStatusAsync(ServiceTaskStatus status);
         Task<ApiResponse<IEnumerable<dynamic>>> GetTasksByTechnicianAsync(int employeeId);
         Task <ApiResponse<IEnumerable<dynamic>>> GetTasksBySubscriptionIdAsync(int subscriptionId);
+
+        Task<ApiResponse<IEnumerable<dynamic>>> GetAwaitingApprovalAsync(int actionUserId);
     }
 
 }

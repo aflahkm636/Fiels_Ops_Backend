@@ -7,20 +7,20 @@ namespace Field_Ops.WebApi.Jobs
     {
         public static void RegisterRecurringJobs()
         {
+            // 1️⃣ Auto-create service tasks when NextServiceDate is due
             RecurringJob.AddOrUpdate<IAutomationService>(
-                "auto-expire",
-                service => service.RunAutoExpire(),
-                 Cron.Daily(9));
+                "auto-service-due",
+                service => service.RunAutoServiceDue(),
+                Cron.Hourly
+            );
 
+            // 2️⃣ Monthly billing draft generation (OPTION B)
             RecurringJob.AddOrUpdate<IAutomationService>(
-                "auto-renew",
-                service => service.RunAutoRenew(),
-                "0 9 * * *");
-
-            //RecurringJob.AddOrUpdate<IAutomationService>(
-            //    "auto-service-due",
-            //    service => service.RunAutoServiceDue(),
-            //    Cron.Hourly);
+                "monthly-billing-generate",
+                service => service.RunMonthlyBilling(),
+                Cron.Monthly
+            );
         }
+
     }
 }

@@ -12,19 +12,44 @@ public class ServiceTasksRepository : IServiceTasksRepository
         _db = db;
     }
 
+   
     public async Task<int> CreateAsync(ServiceTaskCreateDto dto)
     {
         var p = new DynamicParameters();
         p.Add("@FLAG", "CREATE");
         p.Add("@SubscriptionId", dto.SubscriptionId);
         p.Add("@ComplaintId", dto.ComplaintId);
-        p.Add("@TaskDate", dto.TaskDate);
+
+        if (dto.TaskDate.HasValue)
+            p.Add("@TaskDate", dto.TaskDate);
+
         p.Add("@Notes", dto.Notes);
         p.Add("@ActionUserId", dto.ActionUserId);
 
         return await _db.QueryFirstAsync<int>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
+    // ----------------------------------------------------
+    // AUTO CREATE (Scheduler / background job)
+    // ----------------------------------------------------
+    public async Task<int> AutoCreateNextTaskAsync(int subscriptionId, int? actionUserId = null)
+    {
+        var p = new DynamicParameters();
+        p.Add("@FLAG", "AUTO_CREATE");
+        p.Add("@SubscriptionId", subscriptionId);
+        p.Add("@ActionUserId", actionUserId);
+
+        return await _db.QueryFirstAsync<int>(
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
+    }
+
 
     public async Task<IEnumerable<dynamic>> GetAllAsync()
     {
@@ -32,7 +57,10 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@FLAG", "GETALL");
 
         return await _db.QueryAsync<dynamic>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
 
     public async Task<dynamic?> GetByIdAsync(int id)
@@ -42,8 +70,12 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@Id", id);
 
         return await _db.QueryFirstOrDefaultAsync<dynamic>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
 
     public async Task<int> UpdateStatusAsync(ServiceTaskUpdateStatusDto dto)
     {
@@ -52,12 +84,37 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@Id", dto.Id);
         p.Add("@Status", dto.Status.ToString());
         p.Add("@Notes", dto.Notes);
-        p.Add("@ActionUserId", dto.ActionUserId);
         p.Add("@EmployeeId", dto.EmployeeId);
+        p.Add("@ActionUserId", dto.ActionUserId);
 
         return await _db.QueryFirstAsync<int>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
+
+    public async Task<int> UpdateAsync(ServiceTaskUpdateDto dto)
+    {
+        var p = new DynamicParameters();
+        p.Add("@FLAG", "UPDATE");
+        p.Add("@Id", dto.Id);
+
+        if (dto.TaskDate.HasValue)
+            p.Add("@TaskDate", dto.TaskDate);
+
+        p.Add("@Notes", dto.Notes);
+        p.Add("@RequiresMaterialUsage", dto.RequiresMaterialUsage);
+        p.Add("@ActionUserId", dto.ActionUserId);
+
+        return await _db.QueryFirstAsync<int>(
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
+    }
+
 
     public async Task<int> DeleteAsync(int id, int actionUserId)
     {
@@ -67,8 +124,12 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@ActionUserId", actionUserId);
 
         return await _db.QueryFirstAsync<int>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
 
     public async Task<IEnumerable<dynamic>> GetTasksByCustomerAsync(int actionUserId)
     {
@@ -77,18 +138,26 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@ActionUserId", actionUserId);
 
         return await _db.QueryAsync<dynamic>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
 
     public async Task<IEnumerable<dynamic>> GetTasksByStatusAsync(string status)
     {
         var p = new DynamicParameters();
         p.Add("@FLAG", "GETTASKS_BY_STATUS");
-        p.Add("@Status", status.ToString());
+        p.Add("@Status", status);
 
         return await _db.QueryAsync<dynamic>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
 
     public async Task<IEnumerable<dynamic>> GetTasksByTechnicianAsync(int employeeId)
     {
@@ -97,20 +166,6 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@EmployeeId", employeeId);
 
         return await _db.QueryAsync<dynamic>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
-    }
-
-    public async Task<int> UpdateAsync(ServiceTaskUpdateDto dto)
-    {
-        var p = new DynamicParameters();
-        p.Add("@FLAG", "UPDATE");
-        p.Add("@Id", dto.Id);
-        p.Add("@TaskDate", dto.TaskDate);
-        p.Add("@Notes", dto.Notes);
-        p.Add("@RequiresMaterialUsage", dto.RequiresMaterialUsage);
-        p.Add("@ActionUserId", dto.ActionUserId);
-
-        return await _db.QueryFirstAsync<int>(
             "SP_SERVICETASKS",
             p,
             commandType: CommandType.StoredProcedure
@@ -125,8 +180,12 @@ public class ServiceTasksRepository : IServiceTasksRepository
         p.Add("@SubscriptionId", subscriptionId);
 
         return await _db.QueryAsync<dynamic>(
-            "SP_SERVICETASKS", p, commandType: CommandType.StoredProcedure);
+            "SP_SERVICETASKS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
     }
+
 
     public async Task<IEnumerable<dynamic>> GetAwaitingApprovalTasksAsync(int actionUserId)
     {
@@ -140,5 +199,4 @@ public class ServiceTasksRepository : IServiceTasksRepository
             commandType: CommandType.StoredProcedure
         );
     }
-
 }

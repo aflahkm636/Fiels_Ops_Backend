@@ -8,8 +8,7 @@ namespace Field_Ops.Application.Contracts.Service
 {
     public interface IAutomationService
     {
-        Task RunAutoExpire();
-        Task RunAutoRenew();
         Task RunAutoServiceDue();
+        Task RunMonthlyBilling();
     }
 }

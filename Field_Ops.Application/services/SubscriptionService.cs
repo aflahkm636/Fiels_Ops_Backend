@@ -104,56 +104,63 @@ public class SubscriptionService : ISubscriptionService
     }
 
 
-    public async Task<ApiResponse<bool>> DeleteAsync(int id, int deletedBy, string role, int departmentId)
+    //public async Task<ApiResponse<bool>> DeleteAsync(int id, int deletedBy, string role, int departmentId)
+    //{
+    //    if (!CanManageSubscription(role, departmentId))
+    //        throw new AccessViolationException("You are not allowed to delete subscriptions.");
+
+    //    int rows = await _repo.DeleteAsync(id, deletedBy);
+
+    //    if (rows == 0)
+    //        throw new NotFoundException("Subscription not found.");
+
+    //    return ApiResponse<bool>.SuccessResponse(200, "Subscription deleted.");
+    //}
+
+
+    public async Task<ApiResponse<bool>> PauseAsync(
+     int id, int userId, string role, int departmentId)
     {
         if (!CanManageSubscription(role, departmentId))
-            throw new AccessViolationException("You are not allowed to delete subscriptions.");
+            throw new AccessViolationException("Not allowed.");
 
-        int rows = await _repo.DeleteAsync(id, deletedBy);
+        int rows = await _repo.PauseAsync(id, userId);
 
         if (rows == 0)
             throw new NotFoundException("Subscription not found.");
 
-        return ApiResponse<bool>.SuccessResponse(200, "Subscription deleted.");
+        return ApiResponse<bool>.SuccessResponse(200, "Subscription paused.");
     }
-
-
-    public async Task<ApiResponse<bool>> UpdateStatusAsync(
-        int id,
-        SubscriptionStatus status,
-        int userId,
-        string role,
-        int departmentId,
-        DateTime? endDate = null)
+    public async Task<ApiResponse<bool>> ResumeAsync(
+        int id, int userId, string role, int departmentId)
     {
         if (!CanManageSubscription(role, departmentId))
-            throw new AccessViolationException("You are not allowed to update subscription status.");
+            throw new AccessViolationException("Not allowed.");
 
-        int rows;
-
-        switch (status)
-        {
-            case SubscriptionStatus.Paused:
-                rows = await _repo.PauseAsync(id, userId);
-                break;
-
-            case SubscriptionStatus.Active:
-                rows = await _repo.ResumeAsync(id, userId);
-                break;
-
-            case SubscriptionStatus.Expired:
-                var finalEndDate = endDate ?? DateTime.UtcNow.Date;
-                rows = await _repo.CancelAsync(id, userId, finalEndDate);
-                break;
-
-            default:
-                throw new ValidationException("Unsupported subscription status.");
-        }
+        int rows = await _repo.ResumeAsync(id, userId);
 
         if (rows == 0)
             throw new NotFoundException("Subscription not found.");
 
-        return ApiResponse<bool>.SuccessResponse(200, $"Subscription updated to {status}.");
+        return ApiResponse<bool>.SuccessResponse(200, "Subscription resumed.");
     }
+    public async Task<ApiResponse<bool>> CancelAsync(
+        int id, int userId, string role, int departmentId)
+    {
+        if (!CanManageSubscription(role, departmentId))
+            throw new AccessViolationException("Not allowed.");
+
+        int rows = await _repo.CancelAsync(
+            id,
+            userId,
+            DateTime.UtcNow.Date  
+        );
+
+        if (rows == 0)
+            throw new NotFoundException("Subscription not found.");
+
+        return ApiResponse<bool>.SuccessResponse(200, "Subscription cancelled.");
+    }
+
 
 }

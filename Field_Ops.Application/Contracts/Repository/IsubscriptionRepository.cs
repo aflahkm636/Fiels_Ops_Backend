@@ -15,10 +15,9 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<IEnumerable<dynamic>> GetByCustomerIdAsync(int customerId);
         Task<int> UpdateAsync(SubscriptionUpdateDto dto);
         Task<int> DeleteAsync(int id, int deletedBy);
-        Task<int> CancelAsync(int id, int modifiedBy, DateTime? endDate);
+        Task<int> CancelAsync(int id, int modifiedBy, DateTime cancelledOn);
         Task<int> PauseAsync(int id, int modifiedBy);
         Task<int> ResumeAsync(int id, int modifiedBy);
-        Task<int> AutoExpireAsync(int id, int modifiedBy);
         //Task<int> AutoCancelPaymentAsync(int id, int modifiedBy);
     }
 
