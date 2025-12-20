@@ -45,7 +45,7 @@ namespace Field_Ops.WebApi.Extensions
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserService, UserService>(); 
             services.AddScoped<IEmployeesService, EmployeesService>();
             services.AddScoped<ITechniciansService, TechniciansService>();
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
@@ -57,7 +57,7 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<IAutomationService, AutomationService>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IMaterialUsageService, MaterialUsageService>();
-
+            services.AddScoped<IBillingService, BillingService>();
 
             return services;
         }

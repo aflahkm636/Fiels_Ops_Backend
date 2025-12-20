@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Field_Ops.Application.Contracts.Repository;
+using Field_Ops.Application.DTO.BIllingDto;
 using System.Data;
 
 public class BillingRepository : IBillingRepository
@@ -53,24 +54,25 @@ public class BillingRepository : IBillingRepository
         );
     }
 
-    public Task<dynamic> UpdateDiscountAsync(int billingId, decimal discountPercent, int adminUserId)
+    public Task<BillingDto> UpdateDiscountAsync(BillingDiscountUpdateDto dto)
     {
-        return _db.QuerySingleAsync<dynamic>(
+        return _db.QuerySingleAsync<BillingDto>(
             "SP_BILLING_V2",
             new
             {
                 FLAG = "UPDATE_DISCOUNT",
-                Id = billingId,
-                DiscountPercent = discountPercent,
-                ActionUserId = adminUserId
+                Id = dto.BillingId,
+                 dto.DiscountPercent,
+               dto.ActionUserId
             },
             commandType: CommandType.StoredProcedure
         );
     }
 
-    public Task<dynamic> FinalizeAsync(int billingId, int adminUserId)
+
+    public Task<BillingDto> FinalizeAsync(int billingId, int adminUserId)
     {
-        return _db.QuerySingleAsync<dynamic>(
+        return _db.QuerySingleAsync<BillingDto>(
             "SP_BILLING_V2",
             new
             {
@@ -81,4 +83,21 @@ public class BillingRepository : IBillingRepository
             commandType: CommandType.StoredProcedure
         );
     }
+
+    public async Task<bool> RegenerateAsync(int billId, int actionUserId)
+    {
+        var p = new DynamicParameters();
+        p.Add("@FLAG", "REGENERATE");
+        p.Add("@Id", billId);
+        p.Add("@ActionUserId", actionUserId);
+
+        await _db.ExecuteAsync(
+            "SP_BILLING_V2",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
+
+        return true;
+    }
+
 }

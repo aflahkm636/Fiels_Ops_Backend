@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Field_Ops.Application.DTO.BIllingDto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +13,10 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<IEnumerable<dynamic>> GetPendingAsync();
         Task<dynamic?> GetByIdAsync(int id);
         Task<IEnumerable<dynamic>> GetByCustomerAsync(int customerId);
-        Task<dynamic> UpdateDiscountAsync(int billingId, decimal discountPercent, int adminUserId);
-        Task<dynamic> FinalizeAsync(int billingId, int adminUserId);
+        Task<BillingDto> UpdateDiscountAsync(BillingDiscountUpdateDto dto);
+        Task<BillingDto> FinalizeAsync(int billingId, int adminUserId);
+        Task<bool> RegenerateAsync(int billId, int actionUserId);
+
     }
 
 }
