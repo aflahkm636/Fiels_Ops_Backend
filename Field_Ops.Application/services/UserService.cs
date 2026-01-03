@@ -59,10 +59,11 @@ namespace Field_Ops.Application.Services
                 using var stream = dto.ProfileImageFile.OpenReadStream();
 
                 var cloudResult = await _cloudinaryService.UploadImageAsync(
-                    stream,
-                    dto.ProfileImageFile.FileName,
-                    "smartserve/users"
-                );
+       stream,
+       dto.ProfileImageFile.FileName,
+       "fieldops/users"
+   );
+
 
                 dto.ProfileImage = cloudResult.Url;
 

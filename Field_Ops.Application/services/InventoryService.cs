@@ -112,14 +112,33 @@ public class InventoryService : IInventoryService
         return ApiResponse<dynamic>.SuccessResponse(200, "Products fetched successfully.", result);
     }
 
-    public async Task<ApiResponse<dynamic>> GetAllAsync()
+    public async Task<ApiResponse<dynamic>> GetAllAsync(int page, int pageSize)
     {
-        var data = await _repo.GetAllAsync();
+        if (page <= 0) page = 1;
+        if (pageSize <= 0 || pageSize > 100) pageSize = 10;
 
-        return ApiResponse<dynamic>.SuccessResponse(200, "Products fetched.", data);
+        var (items, totalCount) = await _repo.GetAllPagedAsync(page, pageSize);
+
+        var result = new
+        {
+            items,
+            pagination = new
+            {
+                page,
+                pageSize,
+                totalCount,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            }
+        };
+
+        return ApiResponse<dynamic>.SuccessResponse(
+            200,
+            "Products fetched.",
+            result
+        );
     }
 
-   
+
     public async Task<ApiResponse<dynamic>> GetByIdAsync(int id)
     {
         if (id <= 0) throw new ArgumentException("Invalid Id.");

@@ -8,6 +8,18 @@ namespace Field_Ops.Application.Contracts.Service
 {
     public interface IEmailService
     {
-        Task<bool> SendEmailAsync(string to, string subject, string htmlBody);
+        Task<bool> SendEmailAsync(
+            string to,
+            string subject,
+            string htmlBody
+        );
+
+        Task<bool> SendEmailAsync(
+            string to,
+            string subject,
+            string htmlBody,
+            byte[] attachmentBytes,
+            string attachmentName
+        );
     }
 }

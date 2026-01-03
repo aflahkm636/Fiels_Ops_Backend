@@ -99,5 +99,13 @@ public class BillingRepository : IBillingRepository
 
         return true;
     }
+    public async Task<InvoicePdfDto?> GetInvoiceDataAsync(int billId)
+    {
+        return await _db.QuerySingleOrDefaultAsync<InvoicePdfDto>(
+            "SP_BILLING_GET_INVOICE",
+            new { BillingId = billId },
+            commandType: CommandType.StoredProcedure
+        );
+    }
 
 }

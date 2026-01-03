@@ -69,13 +69,14 @@ public class InventoryController : ControllerBase
         }
     }
 
-    
     [HttpGet("all")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
         try
         {
-            var response = await _service.GetAllAsync();
+            var response = await _service.GetAllAsync(page, pageSize);
             return StatusCode(response.StatusCode, response);
         }
         catch (Exception ex)

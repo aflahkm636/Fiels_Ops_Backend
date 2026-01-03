@@ -27,7 +27,7 @@ namespace Field_Ops.Infrastructure.Repository
             parameters.Add("@Phone", dto.Phone);
             parameters.Add("@PasswordHash", dto.PasswordHash);
             parameters.Add("@Role", "Customer");
-            parameters.Add("@ProfileImage", null);
+            parameters.Add("@ProfileImage", dto.ProfileImage);
 
             parameters.Add("@Address", dto.Address);
             parameters.Add("@City", dto.City);
@@ -46,7 +46,7 @@ namespace Field_Ops.Infrastructure.Repository
         }
 
         public async Task<IEnumerable<CustomerDto>> GetAllAsync()
-        {
+        {                                                                   
             var parameters = new DynamicParameters();
             parameters.Add("@FLAG", "GETALL");
 

@@ -16,6 +16,8 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<BillingDto> UpdateDiscountAsync(BillingDiscountUpdateDto dto);
         Task<BillingDto> FinalizeAsync(int billingId, int adminUserId);
         Task<bool> RegenerateAsync(int billId, int actionUserId);
+        Task<InvoicePdfDto?> GetInvoiceDataAsync(int billId);
+
 
     }
 

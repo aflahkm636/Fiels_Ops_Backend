@@ -48,7 +48,7 @@ public class SubscriptionService : ISubscriptionService
         if (newId <= 0)
             throw new ValidationException("Failed to create subscription.");
 
-        return ApiResponse<int>.SuccessResponse(newId, "Subscription created.");
+        return ApiResponse<int>.SuccessResponse(200, "Subscription created.");
     }
 
 

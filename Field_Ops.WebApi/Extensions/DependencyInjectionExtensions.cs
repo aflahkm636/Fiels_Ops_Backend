@@ -7,6 +7,7 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using Field_Ops.Application.Service;
 using Field_Ops.Application.services;
+using Field_Ops.Infrastructure.Services;
 
 namespace Field_Ops.WebApi.Extensions
 {
@@ -58,7 +59,8 @@ namespace Field_Ops.WebApi.Extensions
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IMaterialUsageService, MaterialUsageService>();
             services.AddScoped<IBillingService, BillingService>();
-
+            services.AddScoped<IPdfService, PdfService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             return services;
         }
     }

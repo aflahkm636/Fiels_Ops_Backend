@@ -18,6 +18,7 @@ namespace Field_Ops.Application.DTO.CustomerDto
         public string Address { get; set; } = default!;
         public string City { get; set; } = default!;
         public string Pincode { get; set; } = default!;
+        public string? ProfileImage { get; set; }
 
         public bool Status { get; set; }
     }

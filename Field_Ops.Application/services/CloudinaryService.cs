@@ -43,6 +43,8 @@ public class CloudinaryService : ICloudinaryService
 
             if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
                 throw new Exception("Cloudinary upload failed");
+            Console.WriteLine("CLOUDINARY UPLOAD HIT → " + folder);
+
 
             return new CloudinaryUploadResult
             {

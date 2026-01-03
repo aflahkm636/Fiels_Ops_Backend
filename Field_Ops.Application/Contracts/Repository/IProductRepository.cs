@@ -13,7 +13,7 @@ namespace Field_Ops.Application.Contracts.Repository
         Task<int> UpdateAsync(ProductUpdateDto dto);
         Task<int> DeleteAsync(int id, int actionUserId);
 
-        Task<dynamic> GetAllAsync();
+        Task<(IEnumerable<dynamic> Items, int TotalCount)> GetAllPagedAsync(int page, int pageSize);
         Task<dynamic> GetByIdAsync(int id);
         Task<IEnumerable<dynamic>> FilterAsync(ProductFilterDto dto);
 

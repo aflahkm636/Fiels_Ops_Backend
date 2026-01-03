@@ -4,7 +4,6 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using System.Net.Mail;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 public class EmailService : IEmailService
@@ -16,17 +15,70 @@ public class EmailService : IEmailService
         _settings = settings.Value;
     }
 
-    public async Task<bool> SendEmailAsync(string to, string subject, string htmlBody)
+    /* ------------------------------
+       NORMAL EMAIL (NO ATTACHMENT)
+    ------------------------------ */
+    public async Task<bool> SendEmailAsync(
+        string to,
+        string subject,
+        string htmlBody)
+    {
+        return await SendInternalAsync(
+            to,
+            subject,
+            htmlBody,
+            null,
+            null
+        );
+    }
+
+
+    public async Task<bool> SendEmailAsync(
+        string to,
+        string subject,
+        string htmlBody,
+        byte[] attachmentBytes,
+        string attachmentName)
+    {
+        return await SendInternalAsync(
+            to,
+            subject,
+            htmlBody,
+            attachmentBytes,
+            attachmentName
+        );
+    }
+
+   
+    private async Task<bool> SendInternalAsync(
+        string to,
+        string subject,
+        string htmlBody,
+        byte[]? attachmentBytes,
+        string? attachmentName)
     {
         var email = new MimeMessage();
-        email.From.Add(new MailboxAddress("FieldOps_ERP", _settings.From));
-        email.To.Add(new MailboxAddress("", to));
+        email.From.Add(
+            new MailboxAddress("FieldOps_ERP", _settings.From)
+        );
+        email.To.Add(MailboxAddress.Parse(to));
         email.Subject = subject;
 
-        email.Body = new TextPart("html")
+        var bodyBuilder = new BodyBuilder
         {
-            Text = htmlBody
+            HtmlBody = htmlBody
         };
+
+        if (attachmentBytes != null)
+        {
+            bodyBuilder.Attachments.Add(
+                attachmentName!,
+                attachmentBytes,
+                ContentType.Parse("application/pdf")
+            );
+        }
+
+        email.Body = bodyBuilder.ToMessageBody();
 
         using var smtp = new SmtpClient();
 
@@ -40,7 +92,7 @@ public class EmailService : IEmailService
 
             await smtp.AuthenticateAsync(
                 _settings.Username,
-                _settings.Password 
+                _settings.Password
             );
 
             await smtp.SendAsync(email);
@@ -50,6 +102,7 @@ public class EmailService : IEmailService
         }
         catch (Exception ex)
         {
+            // ⚠️ In real ERP → log this
             Console.WriteLine("SMTP ERROR: " + ex.Message);
             return false;
         }

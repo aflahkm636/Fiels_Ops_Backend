@@ -15,8 +15,7 @@ namespace Field_Ops.Application.DTO.SubscriptionDto
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string? Status { get; set; }
-        public DateTime? LastServiceDate { get; set; }
-        [JsonIgnore]
+         [JsonIgnore]
         public int? CreatedBy { get; set; }
     }
     public class SubscriptionUpdateDto

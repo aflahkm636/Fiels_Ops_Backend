@@ -55,13 +55,25 @@ public class ProductsRepository : IProductsRepository
         return await _db.ExecuteScalarAsync<int>("SP_PRODUCTS", p, commandType: CommandType.StoredProcedure);
     }
 
-    public async Task<dynamic> GetAllAsync()
+    public async Task<(IEnumerable<dynamic> Items, int TotalCount)> GetAllPagedAsync(int page, int pageSize)
     {
         var p = new DynamicParameters();
         p.Add("@FLAG", "GETALL");
+        p.Add("@Page", page);
+        p.Add("@PageSize", pageSize);
 
-        return await _db.QueryAsync("SP_PRODUCTS", p, commandType: CommandType.StoredProcedure);
+        using var multi = await _db.QueryMultipleAsync(
+            "SP_PRODUCTS",
+            p,
+            commandType: CommandType.StoredProcedure
+        );
+
+        var items = await multi.ReadAsync();
+        var totalCount = await multi.ReadFirstAsync<int>();
+
+        return (items, totalCount);
     }
+
 
     public async Task<dynamic> GetByIdAsync(int id)
     {
