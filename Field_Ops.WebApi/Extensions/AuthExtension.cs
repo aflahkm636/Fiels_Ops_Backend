@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -42,12 +45,17 @@ namespace Field_Ops.WebApi.Extensions
         public static IServiceCollection AddFieldOpsAuthorization(
             this IServiceCollection services)
         {
+            // Register PermissionHandler
+            services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
-                options.AddPolicy("StaffOnly", p => p.RequireRole("Staff"));
-                options.AddPolicy("TechnicianOnly", p => p.RequireRole("Technician"));
-                options.AddPolicy("CustomerOnly", p => p.RequireRole("Customer"));
+                // Register all permission-based policies
+                foreach (var permission in Permissions.AllPermissions)
+                {
+                    options.AddPolicy(permission, policy =>
+                        policy.Requirements.Add(new PermissionRequirement(permission)));
+                }
             });
 
             return services;

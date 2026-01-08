@@ -9,7 +9,10 @@ namespace Field_Ops.Application.Helper
   
         public static int GetUserId(this ClaimsPrincipal user)
         {
-            var id = user.FindFirst("UserId")?.Value;
+            // Try custom UserId claim first, then fall back to standard 'sub' claim
+            var id = user.FindFirst("UserId")?.Value 
+                  ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                  ?? user.FindFirst("sub")?.Value;
 
             if (string.IsNullOrEmpty(id))
                 throw new Exception("UserId claim missing in JWT.");

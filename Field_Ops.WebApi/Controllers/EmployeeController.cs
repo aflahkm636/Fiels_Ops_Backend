@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.EmployeeDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,7 @@ namespace Field_Ops.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeesService _service;
@@ -18,7 +20,7 @@ namespace Field_Ops.API.Controllers
         }
         
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.EMPLOYEE_VIEW)]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -26,7 +28,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.EMPLOYEE_VIEW)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -34,16 +36,16 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.EMPLOYEE_UPDATE)]
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] EmployeeUpdateDto dto)
         {
-            dto.ModifiedBy=User.GetUserId();
+            dto.ModifiedBy = User.GetUserId();
             var result = await _service.UpdateEmployeeAsync(dto);
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = Permissions.EMPLOYEE_DELETE)]
         [HttpDelete("{id}")]
 
         public async Task<IActionResult> Delete(int id)

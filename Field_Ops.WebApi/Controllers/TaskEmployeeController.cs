@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Repository;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.TaskEMployeeDto;
 using Field_Ops.Application.Helper;
@@ -20,7 +21,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpPost("assign")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.TASK_ASSIGN)]
     public async Task<IActionResult> Assign([FromBody] TaskEmployeeAssignDto dto)
     {
         try
@@ -37,7 +38,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpDelete("{id:int}/remove")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.TASK_REMOVE_ASSIGNMENT)]
     public async Task<IActionResult> Remove(int id)
     {
         try
@@ -54,7 +55,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpGet("task/{taskId:int}")]
-    [Authorize(Roles = "Admin,Staff,Technician")]
+    [Authorize(Policy = Permissions.TASK_VIEW_ASSIGNMENTS)]
     public async Task<IActionResult> GetByTask(int taskId)
     {
         try
@@ -69,7 +70,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.TASK_VIEW_ASSIGNMENTS)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -84,7 +85,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpGet("employee/{employeeId:int}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.TASK_VIEW_ASSIGNMENTS)]
     public async Task<IActionResult> GetByEmployee(int employeeId)
     {
         try
@@ -99,7 +100,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpGet("technician")]
-    [Authorize(Roles = "Technician,Admin,Staff")]
+    [Authorize(Policy = Permissions.TASK_VIEW_OWN)]
     public async Task<IActionResult> GetTasksByTechnicianStatus([FromQuery] string? status, [FromQuery] int? employeeId)
     {
         try
@@ -126,7 +127,7 @@ public class TaskEmployeesController : ControllerBase
     }
 
     [HttpPut("update")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.TASK_ASSIGN)]
 
     public async Task<IActionResult> Update(TaskEmployeeUpdateDto dto)
     {

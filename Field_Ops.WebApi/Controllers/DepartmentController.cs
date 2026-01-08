@@ -1,11 +1,12 @@
-﻿using Field_Ops.Application.DTO.DepartmentDto;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.DTO.DepartmentDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles ="Admin,Staff")]
+[Authorize]
 public class DepartmentsController : ControllerBase
 {
     private readonly IDepartmentService _service;
@@ -16,11 +17,12 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Permissions.DEPARTMENT_CREATE)]
     public async Task<IActionResult> Create([FromBody] DepartmentCreateDto dto)
     {
         try
         {
-            dto.CreatedBy=User.GetUserId();
+            dto.CreatedBy = User.GetUserId();
             var result = await _service.CreateAsync(dto);
             return StatusCode(result.StatusCode, result);
         }
@@ -31,6 +33,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = Permissions.DEPARTMENT_VIEW)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -45,6 +48,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = Permissions.DEPARTMENT_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -59,6 +63,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Policy = Permissions.DEPARTMENT_UPDATE)]
     public async Task<IActionResult> Update([FromBody] DepartmentUpdateDto dto)
     {
         try
@@ -74,12 +79,13 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = Permissions.DEPARTMENT_DELETE)]
     public async Task<IActionResult> Delete(int id)
     {
         try
         {
 
-            int deletedBy=User.GetUserId();
+            int deletedBy = User.GetUserId();
             var result = await _service.DeleteAsync(id, deletedBy);
             return StatusCode(result.StatusCode, result);
         }

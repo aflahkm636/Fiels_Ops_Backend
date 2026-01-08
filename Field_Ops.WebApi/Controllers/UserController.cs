@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.UserDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace Field_Ops.API.Controllers
         }
 
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.USER_VIEW_ALL)]
         [HttpGet]
 
         public async Task<IActionResult> GetAll()
@@ -28,7 +29,7 @@ namespace Field_Ops.API.Controllers
         }
 
        
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.USER_VIEW_ALL)]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -45,14 +46,6 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        //[HttpGet("email")]
-        //public async Task<IActionResult> GetByEmail([FromQuery] string email)
-        //{
-        //    var result = await _service.GetUserByEmailAsync(email);
-        //    return StatusCode(result.StatusCode, result);
-        //}
-
-
         [Authorize]
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateProfile([FromForm] UserProfileUpdateDto dto)
@@ -64,7 +57,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.USER_UPDATE_ROLE)]
         [HttpPut("role")]
         public async Task<IActionResult> UpdateRole([FromBody] UserRoleUpdateDto dto)
         {
@@ -74,7 +67,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.USER_DELETE)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

@@ -39,15 +39,14 @@ namespace Field_Ops.Infrastructure.Repository
 
         public async Task<dynamic?> GetUserByEmailAsync(string email)
         {
-            var p = new DynamicParameters();
-            p.Add("@FLAG", "GETUSER_BY_EMAIL");
-            p.Add("@Email", email);
+            var sql = @"
+                SELECT u.*, e.DepartmentId, c.Id as CustomerId 
+                FROM Users u
+                LEFT JOIN Employees e ON u.Id = e.UserId
+                LEFT JOIN Customers c ON u.Id = c.UserId
+                WHERE u.Email = @Email AND u.IsDeleted = 0";
 
-            return await _db.QueryFirstOrDefaultAsync<dynamic>(
-                "SP_USERS",
-                p,
-                commandType: CommandType.StoredProcedure
-            );
+            return await _db.QueryFirstOrDefaultAsync<dynamic>(sql, new { Email = email });
         }
 
         public async Task<IEnumerable<dynamic>> GetAllAsync()
@@ -102,7 +101,7 @@ namespace Field_Ops.Infrastructure.Repository
             var p = new DynamicParameters();
             p.Add("@FLAG", "UPDATE_ROLE");
             p.Add("@Id", dto.Id);
-            p.Add("@Role", dto.Role);
+            p.Add("@Role", dto.Role.ToString()); // Convert enum to string name for SP
             p.Add("@ModifiedBy", dto.ModifiedBy);
 
             try

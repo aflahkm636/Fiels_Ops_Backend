@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.MaterialUsageDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,7 @@ public class MaterialUsageController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Technician,Staff,Admin")]
+    [Authorize(Policy = Permissions.MATERIAL_USAGE_CREATE)]
     public async Task<IActionResult> Create([FromBody] MaterialUsageCreateDto dto)
     {
        
@@ -30,7 +31,7 @@ public class MaterialUsageController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.MATERIAL_USAGE_DELETE)]
     public async Task<IActionResult> Delete(int id)
     {
        
@@ -42,7 +43,7 @@ public class MaterialUsageController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Staff,Admin,Technician")]
+    [Authorize(Policy = Permissions.MATERIAL_USAGE_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
         var response = await _service.GetByIdAsync(id);
@@ -50,7 +51,7 @@ public class MaterialUsageController : ControllerBase
     }
 
     [HttpGet("task/{taskId:int}")]
-    [Authorize(Roles = "Staff,Admin,Technician")]
+    [Authorize(Policy = Permissions.MATERIAL_USAGE_VIEW)]
     public async Task<IActionResult> GetByTask(int taskId)
     {
         var response = await _service.GetByTaskAsync(taskId);

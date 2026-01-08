@@ -1,4 +1,4 @@
-﻿using Field_ops.Domain.Enums;
+﻿using Field_ops.Domain;
 using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.SubscriptionDto;
@@ -28,6 +28,7 @@ public class SubscriptionsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Permissions.SUBSCRIPTION_CREATE)]
     public async Task<IActionResult> Create([FromBody] SubscriptionCreateDto dto)
 
     {
@@ -41,7 +42,7 @@ public class SubscriptionsController : ControllerBase
 
 
     [HttpGet]
-
+    [Authorize(Policy = Permissions.SUBSCRIPTION_VIEW)]
     public async Task<IActionResult> GetAll()
     {
         
@@ -53,14 +54,10 @@ public class SubscriptionsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-
-
+    [Authorize(Policy = Permissions.SUBSCRIPTION_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
             var (role, deptId, _) = await GetUserContext();
-
-
-
 
             var result = await _service.GetByIdAsync(id, role, deptId);
             return StatusCode(result.StatusCode, result);
@@ -68,6 +65,7 @@ public class SubscriptionsController : ControllerBase
     }
 
     [HttpGet("by-customer/{customerId}")]
+    [Authorize(Policy = Permissions.SUBSCRIPTION_VIEW)]
     public async Task<IActionResult> GetByCustomerId(int customerId)
     {
             var (role, deptId, _) = await GetUserContext();
@@ -79,6 +77,7 @@ public class SubscriptionsController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Policy = Permissions.SUBSCRIPTION_UPDATE)]
     public async Task<IActionResult> Update([FromBody] SubscriptionUpdateDto dto)
     {
             var (role, deptId, userId) = await GetUserContext();
@@ -91,20 +90,25 @@ public class SubscriptionsController : ControllerBase
 
 
     [HttpPut("{id}/pause")]
+    [Authorize(Policy = Permissions.SUBSCRIPTION_MANAGE)]
     public async Task<IActionResult> Pause(int id)
     {
         var (role, deptId, userId) = await GetUserContext();
         var result = await _service.PauseAsync(id, userId, role, deptId);
         return StatusCode(result.StatusCode, result);
     }
+
     [HttpPut("{id}/resume")]
+    [Authorize(Policy = Permissions.SUBSCRIPTION_MANAGE)]
     public async Task<IActionResult> Resume(int id)
     {
         var (role, deptId, userId) = await GetUserContext();
         var result = await _service.ResumeAsync(id, userId, role, deptId);
         return StatusCode(result.StatusCode, result);
     }
+
     [HttpPut("{id}/cancel")]
+    [Authorize(Policy = Permissions.SUBSCRIPTION_MANAGE)]
     public async Task<IActionResult> Cancel(int id)
     {
         var (role, deptId, userId) = await GetUserContext();

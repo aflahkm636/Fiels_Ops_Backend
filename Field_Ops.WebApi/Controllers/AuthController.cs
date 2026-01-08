@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.CustomerDto;
 using Field_Ops.Application.DTO.EmployeeDto;
 using Field_Ops.Application.DTO.UserDto;
@@ -21,7 +22,7 @@ namespace Field_Ops.Api.Controllers
         }
 
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.CUSTOMER_CREATE)]
         [HttpPost("customer")]
         public async Task<IActionResult> Register([FromForm] CustomerRegisterDto dto)
         {
@@ -33,7 +34,7 @@ namespace Field_Ops.Api.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.EMPLOYEE_CREATE)]
         [HttpPost("Employee")]
         public async Task<IActionResult> CreateEmployee([FromForm] EmployeeCreateDto dto)
         {

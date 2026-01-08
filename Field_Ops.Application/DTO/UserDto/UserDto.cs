@@ -25,6 +25,8 @@ namespace Field_Ops.Application.DTO.UserDto
         public string UserEmail { get; set; } = default!;
         public string UserName { get; set; } = default!;
         public string Role { get; set; } = default!;
+        public int? DepartmentId { get; set; }
+        public int? CustomerId { get; set; }
     }
 
     public static class UserDtoMapper
@@ -39,8 +41,19 @@ namespace Field_Ops.Application.DTO.UserDto
                 UserId = u.Id,           
                 UserEmail = u.Email,
                 UserName = u.Name,
-                Role = u.Role
+                Role = u.Role,
+                DepartmentId = HasProperty(u, "DepartmentId") ? (int?)u.DepartmentId : null,
+                CustomerId = HasProperty(u, "CustomerId") ? (int?)u.CustomerId : null
             };
+        }
+
+        private static bool HasProperty(dynamic obj, string name)
+        {
+            if (obj is IDictionary<string, object> dict)
+                return dict.ContainsKey(name);
+            
+            var type = obj.GetType();
+            return type.GetProperty(name) != null;
         }
     }
 

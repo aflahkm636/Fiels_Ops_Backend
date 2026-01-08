@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -6,6 +7,7 @@ namespace Field_Ops.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TechniciansController : ControllerBase
     {
         private readonly ITechniciansService _service;
@@ -14,7 +16,8 @@ namespace Field_Ops.API.Controllers
         {
             _service = service;
         }
-        [Authorize(Roles ="Staff,Admin")]
+
+        [Authorize(Policy = Permissions.TECHNICIAN_VIEW)]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -22,7 +25,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Policy = Permissions.TECHNICIAN_VIEW)]
         [HttpGet("active")]
         public async Task<IActionResult> GetActive()
         {
@@ -30,7 +33,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Staff,Admin")]
+        [Authorize(Policy = Permissions.TECHNICIAN_VIEW)]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {

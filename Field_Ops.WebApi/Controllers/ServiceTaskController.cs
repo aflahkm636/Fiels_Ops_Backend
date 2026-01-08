@@ -1,4 +1,4 @@
-﻿using Field_ops.Domain.Enums;
+﻿using Field_ops.Domain;
 using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO;
@@ -21,7 +21,7 @@ public class ServiceTasksController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.TASK_CREATE)]
     public async Task<IActionResult> Create(ServiceTaskCreateDto dto)
     {
         dto.ActionUserId = User.GetUserId();
@@ -30,7 +30,7 @@ public class ServiceTasksController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.TASK_VIEW)]
     public async Task<IActionResult> GetAll()
     {
         var response = await _service.GetAllAsync();
@@ -38,7 +38,7 @@ public class ServiceTasksController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = "Admin,Staff,Technician")]
+    [Authorize(Policy = Permissions.TASK_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
         var response = await _service.GetByIdAsync(id);
@@ -46,7 +46,7 @@ public class ServiceTasksController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.TASK_UPDATE)]
     public async Task<IActionResult> Update(int id, ServiceTaskUpdateDto dto)
     {
         dto.Id = id;
@@ -57,18 +57,29 @@ public class ServiceTasksController : ControllerBase
     }
 
     [HttpPatch("{id:int}/status")]
-    [Authorize(Roles = "Staff,Technician,Admin")]
+    [Authorize(Policy = Permissions.TASK_UPDATE_STATUS)]
     public async Task<IActionResult> UpdateStatus(int id, ServiceTaskUpdateStatusDto dto)
     {
         dto.Id = id;
         dto.ActionUserId = User.GetUserId();
+
+        // If employeeId is not provided or is 0, try to resolve it from the current user
+        if (dto.EmployeeId == null || dto.EmployeeId <= 0)
+        {
+            int userId = User.GetUserId();
+            int resolvedEmployeeId = await _empRepo.GetEmployeeIdByUSerID(userId);
+            if (resolvedEmployeeId > 0)
+            {
+                dto.EmployeeId = resolvedEmployeeId;
+            }
+        }
 
         var response = await _service.UpdateStatusAsync(dto);
         return StatusCode(response.StatusCode, response);
     }
 
     [HttpGet("awaiting-approval")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.TASK_VIEW)]
     public async Task<IActionResult> GetAwaitingApproval()
     {
         var response = await _service.GetAwaitingApprovalAsync(User.GetUserId());

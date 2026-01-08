@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Repository;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO;
 using Field_Ops.Application.Helper;
@@ -21,7 +22,7 @@ public class ComplaintsController : ControllerBase
         _employeesRepository = employeesRepository;
     }
 
-    [Authorize(Policy = "CustomerOnly")]
+    [Authorize(Policy = Permissions.COMPLAINT_CREATE_OWN)]
     [HttpPost]
     public async Task<IActionResult> Create(ComplaintCreateDto dto)
     {
@@ -39,7 +40,7 @@ public class ComplaintsController : ControllerBase
         }
     }
 
-    [Authorize(Roles ="Admin,Staff")]
+    [Authorize(Policy = Permissions.COMPLAINT_VIEW)]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -54,7 +55,7 @@ public class ComplaintsController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.COMPLAINT_VIEW)]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -69,7 +70,7 @@ public class ComplaintsController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Technician,Staff")]
+    [Authorize(Policy = Permissions.COMPLAINT_UPDATE)]
     [HttpPut]
     public async Task<IActionResult> Update(ComplaintUpdateDto dto)
     {
@@ -86,14 +87,13 @@ public class ComplaintsController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Technician,Staff")]
+    [Authorize(Policy = Permissions.COMPLAINT_UPDATE_STATUS)]
     [HttpPut("status")]
     public async Task<IActionResult> UpdateStatus(ComplaintStatusUpdateDto dto)
     {
         try
         {
             dto.ActionUserId = User.GetUserId();
-            //dto.ActionUserId = 3;
             var result = await _service.UpdateStatusAsync(dto);
             return StatusCode(result.StatusCode, result);
         }
@@ -103,7 +103,7 @@ public class ComplaintsController : ControllerBase
         }
     }
 
-    [Authorize(Policy ="CustomerOnly")]
+    [Authorize(Policy = Permissions.COMPLAINT_DELETE_OWN)]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -120,7 +120,7 @@ public class ComplaintsController : ControllerBase
     }
 
     [HttpGet("assigned-to-technician")]
-    [Authorize(Roles = "Technician,Admin,Staff")]
+    [Authorize(Policy = Permissions.COMPLAINT_VIEW_ASSIGNED)]
     public async Task<IActionResult> GetComplaintsAssignedToTechnicianAsync()
     {
         try

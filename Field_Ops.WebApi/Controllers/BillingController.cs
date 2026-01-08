@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Repository;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Repository;
 using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.BIllingDto;
 using Field_Ops.Application.Helper;
@@ -21,7 +22,7 @@ public class BillingController : ControllerBase
 
 
     [HttpGet("pending")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.BILLING_VIEW)]
     public async Task<IActionResult> GetPending()
     {
         var response = await _service.GetPendingAsync();
@@ -29,7 +30,7 @@ public class BillingController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.BILLING_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
         var response = await _service.GetByIdAsync(id);
@@ -37,7 +38,7 @@ public class BillingController : ControllerBase
     }
 
     [HttpPut("update-discount")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.BILLING_UPDATE_DISCOUNT)]
     public async Task<IActionResult> UpdateDiscount([FromBody] BillingDiscountUpdateDto dto)
     {
         dto.ActionUserId = User.GetUserId();
@@ -48,7 +49,7 @@ public class BillingController : ControllerBase
     }
 
     [HttpPut("finalize/{id}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.BILLING_FINALIZE)]
     public async Task<IActionResult> Finalize(int id)
     {
         var actionUserId = User.GetUserId();
@@ -58,7 +59,7 @@ public class BillingController : ControllerBase
     }
 
     [HttpPut("regenerate/{id}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.BILLING_FINALIZE)]
     public async Task<IActionResult> Regenerate(int id)
     {
         var actionUserId = User.GetUserId();
@@ -69,7 +70,7 @@ public class BillingController : ControllerBase
 
 
     [HttpGet("my-bills")]
-    [Authorize(Roles = "Customer")]
+    [Authorize(Policy = Permissions.BILLING_VIEW_OWN)]
     public async Task<IActionResult> GetMyBills()
     {
         var userId = User.GetUserId();

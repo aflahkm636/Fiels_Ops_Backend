@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.InventoryDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ public class InventoryController : ControllerBase
 
 
     [HttpPost("create")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.INVENTORY_CREATE)]
     public async Task<IActionResult> Create([FromForm] ProductCreateDto dto)
     {
         try
@@ -36,7 +37,7 @@ public class InventoryController : ControllerBase
 
    
     [HttpPut("update")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.INVENTORY_UPDATE)]
     public async Task<IActionResult> Update([FromForm] ProductUpdateDto dto)
     {
         try
@@ -53,7 +54,7 @@ public class InventoryController : ControllerBase
     }
 
     [HttpDelete("delete/{id}")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.INVENTORY_DELETE)]
     public async Task<IActionResult> Delete(int id)
     {
         try
@@ -70,6 +71,7 @@ public class InventoryController : ControllerBase
     }
 
     [HttpGet("all")]
+    [Authorize(Policy = Permissions.INVENTORY_VIEW)]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
@@ -87,6 +89,7 @@ public class InventoryController : ControllerBase
 
 
     [HttpGet("{id}")]
+    [Authorize(Policy = Permissions.INVENTORY_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -102,6 +105,7 @@ public class InventoryController : ControllerBase
 
 
     [HttpPost("filter")]
+    [Authorize(Policy = Permissions.INVENTORY_VIEW)]
     public async Task<IActionResult> Filter([FromBody] ProductFilterDto dto)
     {
         try
@@ -116,7 +120,7 @@ public class InventoryController : ControllerBase
     }
 
     [HttpPost("increase")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.INVENTORY_MANAGE_STOCK)]
     public async Task<IActionResult> IncreaseQuantity(int id, int qty)
     {
         try
@@ -134,7 +138,7 @@ public class InventoryController : ControllerBase
 
 
     [HttpPost("decrease")]
-    [Authorize(Roles = "Staff,Admin")]
+    [Authorize(Policy = Permissions.INVENTORY_MANAGE_STOCK)]
     public async Task<IActionResult> DecreaseQuantity(int id, int qty)
     {
         try
@@ -152,6 +156,7 @@ public class InventoryController : ControllerBase
 
 
     [HttpGet("low-stock")]
+    [Authorize(Policy = Permissions.INVENTORY_VIEW)]
     public async Task<IActionResult> LowStock()
     {
         try
@@ -167,6 +172,7 @@ public class InventoryController : ControllerBase
 
 
     [HttpGet("inventory-value")]
+    [Authorize(Policy = Permissions.INVENTORY_VIEW)]
     public async Task<IActionResult> InventoryValue()
     {
         try

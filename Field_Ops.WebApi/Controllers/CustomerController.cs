@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.CustomerDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +18,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("all")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.CUSTOMER_VIEW)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -32,7 +33,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.CUSTOMER_VIEW)]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -47,7 +48,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("by-user/{userId}")]
-    [Authorize(Roles = "Admin,Staff")]
+    [Authorize(Policy = Permissions.CUSTOMER_VIEW)]
     public async Task<IActionResult> GetByUserId(int userId)
     {
         try

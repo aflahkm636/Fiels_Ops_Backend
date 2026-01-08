@@ -1,4 +1,5 @@
-﻿using Field_Ops.Application.Contracts.Service;
+﻿using Field_ops.Domain;
+using Field_Ops.Application.Contracts.Service;
 using Field_Ops.Application.DTO.SubscriptionPlanDto;
 using Field_Ops.Application.Helper;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,7 @@ namespace Field_Ops.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class SubscriptionPlansController : ControllerBase
     {
         private readonly ISubscriptionPlanService _service;
@@ -17,7 +19,7 @@ namespace Field_Ops.API.Controllers
             _service = service;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.SUBSCRIPTION_PLAN_CREATE)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SubscriptionPlanCreateDto dto)
         {
@@ -26,7 +28,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.SUBSCRIPTION_PLAN_VIEW)]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -34,7 +36,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Policy = Permissions.SUBSCRIPTION_PLAN_VIEW)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -42,7 +44,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.SUBSCRIPTION_PLAN_UPDATE)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] SubscriptionPlanUpdateDto dto)
         {
@@ -53,7 +55,7 @@ namespace Field_Ops.API.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = Permissions.SUBSCRIPTION_PLAN_DELETE)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

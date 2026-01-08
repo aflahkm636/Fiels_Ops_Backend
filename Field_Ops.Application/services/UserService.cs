@@ -70,7 +70,18 @@ namespace Field_Ops.Application.Services
                 if (!string.IsNullOrEmpty(oldImage))
                 {
                     string publicId = ExtractPublicId(oldImage);
-                    await _cloudinaryService.DeleteImageAsync(publicId);
+                    // Only attempt to delete if we extracted a valid public ID
+                    if (!string.IsNullOrWhiteSpace(publicId))
+                    {
+                        try
+                        {
+                            await _cloudinaryService.DeleteImageAsync(publicId);
+                        }
+                        catch
+                        {
+                            // Ignore deletion errors - old image may not exist or URL format may be different
+                        }
+                    }
                 }
             }
             else
@@ -195,12 +206,38 @@ namespace Field_Ops.Application.Services
         }
         private string ExtractPublicId(string url)
         {
+            if (string.IsNullOrEmpty(url))
+                return string.Empty;
 
-            var parts = url.Split('/');
-            var fileName = parts[^1];              
-            var folder = parts[^2];                  
-
-            return $"smartserve/{folder}/{fileName.Split('.')[0]}";
+            try
+            {
+                // Cloudinary URL format: https://res.cloudinary.com/{cloud}/image/upload/v{version}/{public_id}.{ext}
+                // We need to extract everything after 'upload/v{version}/' without the extension
+                var uri = new Uri(url);
+                var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                
+                // Find the 'upload' segment index
+                int uploadIndex = Array.IndexOf(segments, "upload");
+                if (uploadIndex < 0 || uploadIndex >= segments.Length - 2)
+                    return string.Empty;
+                
+                // Skip 'upload' and version segment (v123456...)
+                var publicIdParts = segments.Skip(uploadIndex + 2).ToArray();
+                if (publicIdParts.Length == 0)
+                    return string.Empty;
+                
+                // Remove extension from the last segment
+                var lastPart = publicIdParts[^1];
+                var dotIndex = lastPart.LastIndexOf('.');
+                if (dotIndex > 0)
+                    publicIdParts[^1] = lastPart.Substring(0, dotIndex);
+                
+                return string.Join("/", publicIdParts);
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
     }

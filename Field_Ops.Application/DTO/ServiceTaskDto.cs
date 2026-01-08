@@ -36,6 +36,10 @@ namespace Field_Ops.Application.DTO
         [JsonIgnore]
         public int ActionUserId { get; set; }
         public int? EmployeeId { get; set; }   // required for technician, optional for staff
+        [JsonIgnore]
+        public string? UserRole { get; set; }  // for SP authorization
+        [JsonIgnore]
+        public int? DeptId { get; set; }       // for SP authorization
     }
 
 }
